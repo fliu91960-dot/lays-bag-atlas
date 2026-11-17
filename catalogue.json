@@ -1,5 +1,5 @@
 {
-  "revision": 13,
+  "revision": 14,
   "updatedAt": "2026-11-17",
   "products": [
     {
@@ -1761,10 +1761,10 @@
       "specification": "70g / 75g / 135g",
       "packagingForm": "袋装",
       "description": "2022 夏季限定转常规；后转常规",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-hotpot-tomato.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2022,
@@ -1778,7 +1778,12 @@
       "productStatus": "原表标注在售，未独立核验",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Ten Top Snacks渠道商品图",
+      "sourceUrl": "https://www.tentopsnacks.com/collections/chips",
+      "sourceImageUrl": "https://www.tentopsnacks.com/cdn/shop/files/laysTomatoHotPotFlavortentopsnacks_1.png?v=1691056069&width=533",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "70g"
     },
     {
       "id": "timeline-l0019",
@@ -1793,10 +1798,10 @@
       "specification": "70g / 75g",
       "packagingForm": "袋装",
       "description": "2022 夏季限定转常规；后转常规",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-hotpot-spicy.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2022,
@@ -1810,7 +1815,12 @@
       "productStatus": "原表标注在售，未独立核验",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Exoticers渠道商品图",
+      "sourceUrl": "https://exoticers.com/products/lays-spicy-butter-hot-pot-flavor-china",
+      "sourceImageUrl": "https://exoticers.com/cdn/shop/products/Lays-Spicy-Butter-Hot-Pot-Flavor-China_1200x1200.png?v=1663450388",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "70g"
     },
     {
       "id": "timeline-l0021",
@@ -1825,10 +1835,10 @@
       "specification": "70g / 75g",
       "packagingForm": "袋装",
       "description": "2022 夏季限定，未全面转常规；京味火锅风",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-hotpot-sesame.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2022,
@@ -1842,7 +1852,12 @@
       "productStatus": "原表标注在售，未独立核验",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Weee渠道商品图",
+      "sourceUrl": "https://www.sayweee.com/zh/product/Lay-s-Potato-Chips--Sesame-Sauce-Hot-Pot-Flavor/100212",
+      "sourceImageUrl": "https://img06.weeecdn.com/product/image/023/135/117E8E1F15E1CF7F.png",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "70g"
     },
     {
       "id": "timeline-l0102",
@@ -1885,7 +1900,7 @@
       "id": "timeline-l0081",
       "name": "惠灵顿牛排味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2023,
       "series": "季节限定",
       "tags": [
         "限定"
@@ -1894,10 +1909,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "以都市热门美食为灵感的一批",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-wellington.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2023,
@@ -1911,13 +1926,20 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Weee渠道商品图",
+      "sourceUrl": "https://www.sayweee.com/zht/product/Lay-s-Potato-Chips-Artificial-Wellington-Steak-Flavor/102205",
+      "sourceImageUrl": "https://img06.weeecdn.com/product/image/571/741/57E1E8695E9C286F.png",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "60g",
+      "yearEvidenceUrl": "https://socialbeta.com/campaign/14723",
+      "yearEvidence": "2023年春季限定新品报道列示惠灵顿牛排、椒盐皮皮虾与章鱼小丸子，展示对应金色包装。"
     },
     {
       "id": "timeline-l0082",
       "name": "椒盐皮皮虾味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2023,
       "series": "季节限定",
       "tags": [
         "限定"
@@ -1926,10 +1948,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-pepper-shrimp.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2023,
@@ -1943,7 +1965,14 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Exoticers渠道商品图",
+      "sourceUrl": "https://exoticers.com/products/lays-spring-limited-edition-salt-pepper-shrimp-china",
+      "sourceImageUrl": "https://exoticers.com/cdn/shop/products/LaysLimitedEditionPepperShrimp_1200x1200.png?v=1677892866",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "60g",
+      "yearEvidenceUrl": "https://socialbeta.com/campaign/14723",
+      "yearEvidence": "2023年春季限定新品报道列示惠灵顿牛排、椒盐皮皮虾与章鱼小丸子，展示对应金色包装。"
     },
     {
       "id": "timeline-l0086",
@@ -1981,7 +2010,7 @@
       "id": "timeline-l0083",
       "name": "章鱼小丸子味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2023,
       "series": "季节限定",
       "tags": [
         "限定"
@@ -1990,10 +2019,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-takoyaki.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2023,
@@ -2007,7 +2036,14 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Exoticers渠道商品图",
+      "sourceUrl": "https://exoticers.com/products/lays-spring-limited-edition-octopus-balls-china",
+      "sourceImageUrl": "https://exoticers.com/cdn/shop/products/LaysOctopusBalls_1200x1200.png?v=1677891520",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "60g",
+      "yearEvidenceUrl": "https://socialbeta.com/campaign/14723",
+      "yearEvidence": "2023年春季限定新品报道列示惠灵顿牛排、椒盐皮皮虾与章鱼小丸子，展示对应金色包装。"
     },
     {
       "id": "timeline-l0084",
