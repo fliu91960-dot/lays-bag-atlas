@@ -1,5 +1,5 @@
 {
-  "revision": 6,
+  "revision": 8,
   "updatedAt": "2026-11-17",
   "products": [
     {
@@ -1326,10 +1326,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/foodaily-1418-1.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2021,
@@ -1343,7 +1343,12 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": "2 版；2022 / 2024；None",
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Foodaily产品档案（宣传图）",
+      "sourceUrl": "https://www.foodaily.com/new_products/1418",
+      "sourceImageUrl": "https://cdn.img.foodaily.com/images/new_products/high_image/2022/11/09/d75fb430d5bdfff44ce959feb9541083.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "135g"
     },
     {
       "id": "timeline-l0103",
@@ -1390,10 +1395,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "蹭淄博烧烤热度",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/foodaily-2067-0.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2021,
@@ -1407,7 +1412,12 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Foodaily产品档案",
+      "sourceUrl": "https://www.foodaily.com/new_products/2067",
+      "sourceImageUrl": "https://cdn.img.foodaily.com/images/new_products/high_image/2023/07/23/60482e3e061ece864e043327f70322c5.png",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "70g"
     },
     {
       "id": "timeline-l0105",
@@ -1710,10 +1720,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "与 2022 版包装设计一脉相承",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/foodaily-1418-0.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2023,
@@ -1727,7 +1737,12 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Foodaily产品档案",
+      "sourceUrl": "https://www.foodaily.com/new_products/1418",
+      "sourceImageUrl": "https://cdn.img.foodaily.com/images/new_products/high_image/2022/11/09/db4c9a626cf7ae9c8a6c2b5c03876235.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "70g"
     },
     {
       "id": "timeline-l0081",
@@ -2696,10 +2711,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/foodaily-3403-2.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2025,
@@ -2713,7 +2728,12 @@
       "productStatus": "历史联名/当前状态未知",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Foodaily产品档案",
+      "sourceUrl": "https://www.foodaily.com/new_products/3403",
+      "sourceImageUrl": "https://cdn.img.foodaily.com/images/new_products/high_image/2025/09/09/465f29b2b14a7c505e853a118ac1131f.png",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "70g"
     },
     {
       "id": "timeline-l0129",
@@ -2762,10 +2782,10 @@
       "specification": "23g×6",
       "packagingForm": "袋装",
       "description": "与常规青柠味分开记录，属于联名包装/小规格产品。",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/foodaily-3479-0.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2025,
@@ -2779,7 +2799,12 @@
       "productStatus": "历史联名/当前状态未知",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Foodaily产品档案（宣传图）",
+      "sourceUrl": "https://www.foodaily.com/new_products/3479",
+      "sourceImageUrl": "https://cdn.img.foodaily.com/images/new_products/high_image/2025/09/25/ec0bedc6e85f27e9ccd3b446061b3ce4.png",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "23g"
     },
     {
       "id": "timeline-l0139",
