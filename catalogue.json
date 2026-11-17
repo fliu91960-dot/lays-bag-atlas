@@ -1,5 +1,5 @@
 {
-  "revision": 10,
+  "revision": 11,
   "updatedAt": "2026-11-17",
   "products": [
     {
@@ -1049,16 +1049,17 @@
       "year": null,
       "series": "季节限定",
       "tags": [
-        "限定"
+        "限定",
+        "联名"
       ],
       "flavor": "芙蓉樱花虾味",
       "specification": "",
       "packagingForm": "袋装",
       "description": "部分资料归入 2020 春季",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-shrimp.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2019,
@@ -1072,7 +1073,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Weee渠道商品图（泡泡玛特联名）",
+      "sourceUrl": "https://www.sayweee.com/en/product/Lay-s-x-Popmart-Potato-Chips-Hibiscus-Cherry-Blossom-Shrimp-Seasonal-Only/90216",
+      "sourceImageUrl": "https://img06.weeecdn.com/item/image/261/512/35B0C61B03261E47.png",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "60g"
     },
     {
       "id": "timeline-l0073",
@@ -1081,16 +1087,17 @@
       "year": null,
       "series": "季节限定",
       "tags": [
-        "限定"
+        "限定",
+        "联名"
       ],
       "flavor": "黄油煎松茸味",
       "specification": "",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-matsutake.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2019,
@@ -1104,7 +1111,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Weee渠道商品图（泡泡玛特联名）",
+      "sourceUrl": "https://www.sayweee.com/ko/product/Lay-s-x-Popmart-Potato-Chips-Pan-Fried-Matsutake-Flavor/89304",
+      "sourceImageUrl": "https://img06.weeecdn.com/item/image/633/056/7943718A3B707F0E.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "60g"
     },
     {
       "id": "timeline-l0099",
@@ -1156,10 +1168,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "气泡薯片系列，开袋有碳酸感",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-blue-soda.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2020,
@@ -1173,7 +1185,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "什么值得买新品档案（宣传图）",
+      "sourceUrl": "https://wiki.smzdm.com/item/kl6j5xd/",
+      "sourceImageUrl": "https://qny.smzdm.com/202002/29/5e5a6b787a1511674.png_e600.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": ""
     },
     {
       "id": "timeline-l0075",
@@ -1188,10 +1205,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "同上",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-pink-soda.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2020,
@@ -1205,7 +1222,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "什么值得买新品档案（宣传图）",
+      "sourceUrl": "https://wiki.smzdm.com/item/kl6j5xd/",
+      "sourceImageUrl": "https://qny.smzdm.com/202002/29/5e5a6b7a1b8c81052.png_e600.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": ""
     },
     {
       "id": "timeline-l0076",
@@ -1220,10 +1242,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "同上",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-grape-soda.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2020,
@@ -1237,7 +1259,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "什么值得买新品档案（宣传图）",
+      "sourceUrl": "https://wiki.smzdm.com/item/kl6j5xd/",
+      "sourceImageUrl": "https://y.zdmimg.com/202002/29/5e5a6b937d53c6045.png_e600.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": ""
     },
     {
       "id": "timeline-l0117",
