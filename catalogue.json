@@ -1,5 +1,5 @@
 {
-  "revision": 9,
+  "revision": 10,
   "updatedAt": "2026-11-17",
   "products": [
     {
@@ -1253,10 +1253,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "同上，端午节档期",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/historical2020-8.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2020,
@@ -1270,7 +1270,11 @@
       "productStatus": "历史联名/当前状态未知",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃转载果壳历史实拍",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_8541406",
+      "sourceImageUrl": "https://image.thepaper.cn/depository/image/80/905/990.jpg",
+      "sourceCheckedAt": "2026-11-17"
     },
     {
       "id": "timeline-l0116",
@@ -1286,10 +1290,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "同上，辣度偏高",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/historical2020-9.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2020,
@@ -1303,7 +1307,11 @@
       "productStatus": "历史联名/当前状态未知",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃转载果壳历史实拍",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_8541406",
+      "sourceImageUrl": "https://image.thepaper.cn/depository/image/80/906/31.jpg",
+      "sourceCheckedAt": "2026-11-17"
     },
     {
       "id": "timeline-l0115",
@@ -1319,10 +1327,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "国货联名三连之一",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/historical2020-10.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2020,
@@ -1336,7 +1344,11 @@
       "productStatus": "历史联名/当前状态未知",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃转载果壳历史实拍",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_8541406",
+      "sourceImageUrl": "https://image.thepaper.cn/depository/image/80/906/64.jpg",
+      "sourceCheckedAt": "2026-11-17"
     },
     {
       "id": "timeline-l0101",
