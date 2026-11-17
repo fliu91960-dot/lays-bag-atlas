@@ -12,6 +12,9 @@
   const now = () => new Date().toISOString();
   const uid = prefix => prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9);
   function assert(condition, message) { if (!condition) throw new Error(message); }
+  // BEGIN imported timeline
+  const TIMELINE = {"official-cn-1": {"timelineRecordId": "L0001", "firstSeenYear": 1993, "firstSeenProvisional": true, "timelineEvidence": "原始表记录；年份/类别待复核", "timelineNote": "1993 年进入中国时的初代口味；同上", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-2": {"timelineRecordId": "L0002", "firstSeenYear": 1993, "firstSeenProvisional": true, "timelineEvidence": "行业报道支持1993年进入中国及经典口味；单款首发年未独立证实", "timelineNote": "初代四口味之一", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-3": {"timelineRecordId": "L0003", "firstSeenYear": 1993, "firstSeenProvisional": true, "timelineEvidence": "行业报道支持1993年进入中国及经典口味；单款首发年未独立证实", "timelineNote": "初代四口味之一", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-4": {"timelineRecordId": "L0004", "firstSeenYear": 1993, "firstSeenProvisional": true, "timelineEvidence": "行业报道支持1993年进入中国及经典口味；单款首发年未独立证实", "timelineNote": "初代四口味之一，美式烟熏烧烤风", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-5": {"timelineRecordId": "L0005", "firstSeenYear": 2005, "firstSeenProvisional": true, "timelineEvidence": "原始表记录；年份/类别待复核", "timelineNote": "2005 年清爽系列出身，当年被视为异端；同上，与原版黄瓜味区分", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-6": {"timelineRecordId": "L0006", "firstSeenYear": 2005, "firstSeenProvisional": true, "timelineEvidence": "行业报道明确提及2005年清爽系列", "timelineNote": "2005 年清爽系列出身", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-7": {"timelineRecordId": "L0007", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "川式牛油火锅风", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-8": {"timelineRecordId": "L0008", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "夏季限定起家，后转常规", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-9": {"timelineRecordId": "L0009", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-10": {"timelineRecordId": "L0010", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "部分渠道写作「清新芥香」", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-11": {"timelineRecordId": "L0011", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "夏季限定起家", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-12": {"timelineRecordId": "L0012", "firstSeenYear": 2020, "firstSeenProvisional": true, "timelineEvidence": "行业报道提供早期区域限定时间线；具体批次和包装版本仍待实物核对", "timelineNote": "2020 川味区域限定，后全国化；首款区域限定，后全国化转为常规", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-13": {"timelineRecordId": "L0013", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-14": {"timelineRecordId": "L0014", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-15": {"timelineRecordId": "L0015", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "2025 年前后上新的海鲜系", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-16": {"timelineRecordId": "L0016", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "同上", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-17": {"timelineRecordId": "L0017", "firstSeenYear": 2021, "firstSeenProvisional": true, "timelineEvidence": "行业报道提供早期区域限定时间线；具体批次和包装版本仍待实物核对", "timelineNote": "2021 川味区域限定，后全国化；后全国化转为常规", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-cn-18": {"timelineRecordId": "L0018", "firstSeenYear": 2021, "firstSeenProvisional": true, "timelineEvidence": "原始表记录；年份/类别待复核", "timelineNote": "后转为常规在售", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-wave-1": {"timelineRecordId": "L0022", "firstSeenYear": 2023, "firstSeenProvisional": true, "timelineEvidence": "原始表记录；年份/类别待复核", "timelineNote": "厚切波浪，调味更重；借开学季「鸡腿风浪套餐」带货；开学季「鸡腿风浪套餐」联动", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-wave-2": {"timelineRecordId": "L0023", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-wave-3": {"timelineRecordId": "L0024", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-wave-4": {"timelineRecordId": "L0025", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "同风味，厚切版本", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-wave-5": {"timelineRecordId": "L0026", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}, "official-wave-6": {"timelineRecordId": "L0027", "firstSeenYear": null, "firstSeenProvisional": false, "timelineEvidence": "原始Excel记录；未逐条核验", "timelineNote": "", "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"}};
+  // END imported timeline
   function initialState() {
     const examples = [
       ['美国经典原味', '75g', 1],
@@ -51,20 +54,28 @@
         yearEvidenceUrl:'https://www.pepsico.com.cn/media-center/brand-news/211',yearEvidence:'百事中国2026年6月2日品牌新闻介绍该届世界杯限定系列，列出炸鱼薯条、蒜香黄油等袋装口味；包装正面亦标明2026。',
         active:true,isDemo:false,createTime:'2026-11-17T00:00:00.000Z',updateTime:'2026-11-17T00:00:00.000Z'
       }));
-    return { version: 1, fixtureRevision: 3, currentUserId: 'collector', users: [
+    chips.forEach(c => Object.assign(c, TIMELINE[c.id] || {}));
+    return { version: 1, fixtureRevision: 4, currentUserId: 'collector', users: [
       { id: 'collector', name: '收藏者', role: 'user' },
       { id: 'collector-2', name: '另一位收藏者', role: 'user' },
       { id: 'admin', name: '管理员', role: 'owner' }
     ], chips, favorites: [], submissions: [] };
   }
   function migrateState(input) {
-    if (input.fixtureRevision === 3) return clone(input);
+    if (input.fixtureRevision >= 4) return clone(input);
+    if (input.fixtureRevision === 3) {
+      const next = clone(input);
+      next.chips.forEach(c => Object.assign(c, TIMELINE[c.id] || {}));
+      next.fixtureRevision = 4;
+      return next;
+    }
     const next = clone(input), map = {'demo-1':'official-cn-1','demo-2':'official-cn-6','demo-3':'official-cn-3'};
     const removable = new Set(next.chips.filter(c => c.isDemo && /^demo-\d+$/.test(c.id) && c.updateTime === '2026-11-16T00:00:00.000Z' && (!next.favorites.some(f => f.chipId === c.id) || map[c.id])).map(c => c.id));
     next.chips = initialState().chips.filter(c => !next.chips.some(old => old.id === c.id)).concat(next.chips.filter(c => !removable.has(c.id)));
     next.favorites.forEach(f => { if (removable.has(f.chipId) && map[f.chipId]) f.chipId = map[f.chipId]; });
     const pairs = new Set(); next.favorites = next.favorites.filter(f => { const key = f.userId + ':' + f.chipId; if (pairs.has(key)) return false; pairs.add(key); return true; });
-    next.fixtureRevision = 3;
+    next.chips.forEach(c => Object.assign(c, TIMELINE[c.id] || {}));
+    next.fixtureRevision = 4;
     return next;
   }
   function bindIdentity(input, session) {
