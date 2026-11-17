@@ -32,7 +32,23 @@
       request.onsuccess = () => { database = request.result; database.onversionchange = () => database.close(); resolve(); };
       request.onerror = () => reject(new Error('请允许浏览器保存收藏数据后重试'));
     });
-    return mutate(value => C.validateState(value));
+    let catalogue;
+    if (location.protocol !== 'file:') {
+      try {
+        const response = await fetch('./catalogue.json', {cache:'no-store'});
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data.products) && data.products.length && new Set(data.products.map(c=>c.id)).size === data.products.length) catalogue = data.products;
+        }
+      } catch (_) { /* Shipped catalogue remains available when the data file is unreachable. */ }
+    }
+    return mutate(value => {
+      if (catalogue) {
+        const ids = new Set(catalogue.map(c=>c.id));
+        value.chips = C.clone(catalogue).concat(value.chips.filter(c=>!ids.has(c.id)));
+      }
+      return C.validateState(value);
+    });
   }
   window.AtlasRepository = {publicMode:true,initialize,read,mutate,onExternalChange:callback => { if (updates) updates.onmessage = callback; }};
 })();

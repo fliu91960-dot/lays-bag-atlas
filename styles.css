@@ -11,3 +11,5 @@
 .filter-trigger{display:flex;align-items:center;justify-content:center;gap:5px;flex-shrink:0;padding:0 11px;border:1px solid #dfdacd;border-radius:13px;font-size:12px;height:43px}.filter-trigger svg{width:17px;height:17px}.filter-trigger.selected{background:#fae9a1;border-color:#e6c861}.filter-count{min-width:16px;height:16px;border-radius:50%;background:#9e4435;color:white;display:grid;place-items:center;font-size:10px}
 
 .chip-year{font-size:12px;line-height:1.6;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
+
+.image-pending{height:100%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#9b927e;background:#ede9df}.image-pending svg{width:42px;height:42px}.image-pending span{font-size:13px}.chip-meta{flex-wrap:wrap;overflow-wrap:anywhere}
