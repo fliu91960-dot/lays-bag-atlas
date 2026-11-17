@@ -1,5 +1,5 @@
 {
-  "revision": 11,
+  "revision": 12,
   "updatedAt": "2026-11-17",
   "products": [
     {
@@ -1046,8 +1046,8 @@
       "id": "timeline-l0072",
       "name": "芙蓉樱花虾味",
       "market": "中国大陆",
-      "year": null,
-      "series": "季节限定",
+      "year": 2022,
+      "series": "泡泡玛特小甜豆",
       "tags": [
         "限定",
         "联名"
@@ -1078,14 +1078,16 @@
       "sourceUrl": "https://www.sayweee.com/en/product/Lay-s-x-Popmart-Potato-Chips-Hibiscus-Cherry-Blossom-Shrimp-Seasonal-Only/90216",
       "sourceImageUrl": "https://img06.weeecdn.com/item/image/261/512/35B0C61B03261E47.png",
       "sourceCheckedAt": "2026-11-17",
-      "imageSpecification": "60g"
+      "imageSpecification": "60g",
+      "yearEvidenceUrl": "https://www.digitaling.com/projects/231664.html",
+      "yearEvidence": "品牌项目团队案例说明：2022年春季限定，泡泡玛特小甜豆联名，三款为醇香黑松露、芙蓉樱花虾、黄油煎松茸。"
     },
     {
       "id": "timeline-l0073",
       "name": "黄油煎松茸味",
       "market": "中国大陆",
-      "year": null,
-      "series": "季节限定",
+      "year": 2022,
+      "series": "泡泡玛特小甜豆",
       "tags": [
         "限定",
         "联名"
@@ -1116,7 +1118,39 @@
       "sourceUrl": "https://www.sayweee.com/ko/product/Lay-s-x-Popmart-Potato-Chips-Pan-Fried-Matsutake-Flavor/89304",
       "sourceImageUrl": "https://img06.weeecdn.com/item/image/633/056/7943718A3B707F0E.jpg",
       "sourceCheckedAt": "2026-11-17",
-      "imageSpecification": "60g"
+      "imageSpecification": "60g",
+      "yearEvidenceUrl": "https://www.digitaling.com/projects/231664.html",
+      "yearEvidence": "品牌项目团队案例说明：2022年春季限定，泡泡玛特小甜豆联名，三款为醇香黑松露、芙蓉樱花虾、黄油煎松茸。"
+    },
+    {
+      "id": "popmart-2022-truffle",
+      "name": "醇香黑松露味",
+      "market": "中国大陆",
+      "year": 2022,
+      "series": "泡泡玛特小甜豆",
+      "tags": [
+        "限定",
+        "联名"
+      ],
+      "flavor": "醇香黑松露味",
+      "specification": "60g",
+      "packagingForm": "袋装",
+      "description": "2022年春季限定，乐事与泡泡玛特小甜豆联名三款之一。",
+      "coverImage": "assets/front-truffle.jpg",
+      "backImage": "",
+      "imagePending": false,
+      "sourceKind": "media",
+      "sourceLabel": "Weee渠道商品图（泡泡玛特联名）",
+      "sourceUrl": "https://www.sayweee.com/zh/product/Lay-s-x-Popmart-Potato-Chips-Potato-Chips--Black-Truffle-Flavor/89303",
+      "sourceImageUrl": "https://img06.weeecdn.com/item/image/712/220/190ACC13366380DA.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "60g",
+      "yearEvidenceUrl": "https://www.digitaling.com/projects/231664.html",
+      "yearEvidence": "品牌项目团队案例说明：2022年春季限定，泡泡玛特小甜豆联名，三款为醇香黑松露、芙蓉樱花虾、黄油煎松茸。",
+      "active": true,
+      "isDemo": false,
+      "createTime": "2026-11-17T00:00:00.000Z",
+      "updateTime": "2026-11-17T00:00:00.000Z"
     },
     {
       "id": "timeline-l0099",
@@ -1528,10 +1562,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "有资料记为 2020 年上市；包装注明不添加酒精",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-beer.png",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2021,
@@ -1545,7 +1579,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "GFSuper渠道商品图",
+      "sourceUrl": "https://ma.gfsuper.com/products/copy-of-乐事薯片-金黄炒蟹味-135g",
+      "sourceImageUrl": "https://ma.gfsuper.com/cdn/shop/products/laysbeer_1024x.png?v=1647359636",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "70g"
     },
     {
       "id": "timeline-l0078",
@@ -1592,10 +1631,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "薯片上有杨梅碎",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-yangmei.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2021,
@@ -1609,7 +1648,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Weee渠道商品图",
+      "sourceUrl": "https://www.sayweee.com/zht/product/Lay-s-Potato-Chips--Yangmei-Flavor/78097",
+      "sourceImageUrl": "https://img06.weeecdn.com/item/image/799/962/6A9A274DF8F513EE.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": ""
     },
     {
       "id": "timeline-l0079",
