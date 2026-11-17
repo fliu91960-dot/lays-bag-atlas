@@ -22,7 +22,7 @@
   function icon(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + (paths[name] || paths.bag) + '"></path></svg>'; }
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const image = value => C.validImage(value) ? value : 'assets/unknown.png';
-  const safeSource = value => { try { const u = new URL(value); return u.protocol === 'https:' && ['www.lays.com.cn','www.pepsico.com.cn','m.thepaper.cn','www.dealmoon.com','marketfoodasia.com','tao.hooos.com','www.foodaily.com','foodaily.com'].includes(u.hostname) && !u.username && !u.password; } catch (_) { return false; } };
+  const safeSource = value => { try { const u = new URL(value); return u.protocol === 'https:' && ['www.lays.com.cn','www.pepsico.com.cn','m.thepaper.cn','www.dealmoon.com','marketfoodasia.com','tao.hooos.com','www.foodaily.com','foodaily.com','post.smzdm.com','k.sina.cn','k.sina.com.cn','www.sohu.com'].includes(u.hostname) && !u.username && !u.password; } catch (_) { return false; } };
   const date = value => { const d = new Date(value); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('zh-CN'); };
   const statusName = { pending:'待审核', approved:'已收录', rejected:'未通过' };
   let state, route = { name:'catalog' }, trail = [], sheet = null, draft = null, busy = false;

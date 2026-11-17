@@ -1,5 +1,5 @@
 {
-  "revision": 8,
+  "revision": 9,
   "updatedAt": "2026-11-17",
   "products": [
     {
@@ -843,10 +843,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "借「当然是选择原谅啊」热梗，命名由消费者投票产生",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/review-summer-0.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2018,
@@ -860,7 +860,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "什么值得买历史实拍",
+      "sourceUrl": "https://post.smzdm.com/p/av7ke5en/",
+      "sourceImageUrl": "https://qnam.smzdm.com/201811/23/5bf794f38fc094261.jpg_e1080.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": ""
     },
     {
       "id": "timeline-l0068",
@@ -939,10 +944,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-peach.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2019,
@@ -956,7 +961,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "新浪历史报道配图",
+      "sourceUrl": "https://k.sina.cn/article_6399054092_17d69d10c00100g3rh.html",
+      "sourceImageUrl": "https://k.sinaimg.cn/n/front/406/w614h592/20190124/YCxS-hryfqhm8127713.jpg/w700d1q75cms.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "65g"
     },
     {
       "id": "timeline-l0071",
@@ -971,10 +981,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-plum.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2019,
@@ -988,7 +998,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "新浪报道实拍",
+      "sourceUrl": "https://k.sina.com.cn/article_7417827118_1ba230f2e001018jeg.html",
+      "sourceImageUrl": "https://n.sinaimg.cn/sinakd10109/440/w640h600/20220108/aa1c-3a47ac5364d0f2a51a376f24a465f182.png",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "65g"
     },
     {
       "id": "timeline-l0069",
@@ -1003,10 +1018,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "春季花果线开端",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/review-spring-2.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2019,
@@ -1020,7 +1035,12 @@
       "productStatus": "历史限定/复刻状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "什么值得买历史实拍",
+      "sourceUrl": "https://post.smzdm.com/p/amm0ve6z/",
+      "sourceImageUrl": "https://qnam.smzdm.com/201904/08/5cab6747688897533.jpg_e1080.jpg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": "65g"
     },
     {
       "id": "timeline-l0072",
@@ -1099,10 +1119,10 @@
       "specification": "70g / 135g",
       "packagingForm": "袋装",
       "description": "与藤椒钵钵鸡同批上市",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/front-duck.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2020,
@@ -1116,7 +1136,12 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "搜狐历史报道配图",
+      "sourceUrl": "https://www.sohu.com/a/395751332_120128000",
+      "sourceImageUrl": "https://p2.itc.cn/images01/20200517/c9c4db3aa97c4236b32aa5a6a4ca46a3.jpeg",
+      "sourceCheckedAt": "2026-11-17",
+      "imageSpecification": ""
     },
     {
       "id": "timeline-l0074",
