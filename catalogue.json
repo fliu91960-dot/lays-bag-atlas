@@ -1,5 +1,5 @@
 {
-  "revision": 23,
+  "revision": 24,
   "updatedAt": "2026-11-18",
   "products": [
     {
@@ -1319,7 +1319,7 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "同上，端午节档期",
-      "coverImage": "assets/historical2020-8.jpg",
+      "coverImage": "assets/white-l0117.webp",
       "backImage": "",
       "imagePending": false,
       "sourceKind": "media",
@@ -1337,10 +1337,11 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "sourceLabel": "澎湃转载果壳历史实拍",
-      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_8541406",
-      "sourceImageUrl": "https://image.thepaper.cn/depository/image/80/905/990.jpg",
-      "sourceCheckedAt": "2026-11-17"
+      "sourceLabel": "Fuji-san商品图",
+      "sourceUrl": "https://fuji-san.ru/japonskie-chipsy-sneki/chipsy-iz-yaponii-i-kitaya/chipsy-lays-i-pringles-neobychnye-vkusy/chipsy-lays-so-vkusom-solenogo-yaytsa-i-myasnykh-pelmeney-65g-kitay/",
+      "sourceImageUrl": "https://fuji-san.ru/wa-data/public/shop/products/78/87/8778/images/11530/11530.970.jpg",
+      "sourceCheckedAt": "2026-11-18",
+      "imageSpecification": "65g"
     },
     {
       "id": "timeline-l0116",
