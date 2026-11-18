@@ -37,24 +37,24 @@
   function header(title, end) { return '<header class="sub-header">' + button(icon('back'), 'back', 'back', 'aria-label="返回"') + '<h2>' + esc(title) + '</h2>' + (end ? '<div class="header-end">' + end + '</div>' : '') + '</header>'; }
   function navigation() { return '<nav class="bottom-nav" aria-label="主要导航">' + [['catalog','grid','图鉴'],['favorites','bookmark','我的收藏'],['profile','user','我的']].map(([name, i, text]) => button('<span class="nav-icon">' + icon(i) + '</span><span>' + text + '</span>', 'nav', route.name === name ? 'active' : '', 'data-name="' + name + '" aria-current="' + (route.name === name ? 'page' : 'false') + '"')).join('') + '</nav>'; }
   function empty(title, message, action) { return '<div class="empty">' + icon('bag') + '<strong>' + esc(title) + '</strong><p>' + esc(message) + '</p>' + (action || '') + '</div>'; }
-  function visibleTags(item) {
-    return item.tags.includes('城市限定') ? item.tags.filter(tag => tag !== '限定') : item.tags;
+  function tags(item, onCard = false) {
+    const batch = item.releaseBatch;
+    const names = item.tags.filter(tag =>
+      !batch?.includes(tag) && !(tag === '联名' && batch?.includes('聯名')) &&
+      !(tag === '限定' && item.tags.includes('城市限定')));
+    const style = onCard ? 'edition' : 'tag';
+    const badge = batch ? '<span class="' + style + (onCard ? ' edition-batch' : '') + '">' + esc(batch) + '</span>' : '';
+    if (!batch && names.length === 0 && !onCard) return '<span class="tag">常规</span>';
+    return badge + names.map(tag => '<span class="' + style + '">' + esc(tag) + '</span>').join('');
   }
-  function tags(item) { return item.tags.length ? visibleTags(item).map(t => '<span class="tag">' + esc(t) + '</span>').join('') : '<span class="tag">常规</span>'; }
   function yearLabel(item) {
     if (item.year) return '包装：' + item.year + '年';
     const year = item.firstSeenYear || item.flavorDocumentedYear;
     return year ? '口味首见：' + year + '年' + (item.firstSeenProvisional ? '（待核）' : '') : '年份待核实';
   }
-  function cardTags(item) {
-    const batch = item.releaseBatch;
-    const genericTags = visibleTags(item).filter(tag => !batch?.includes(tag) && !(tag === '联名' && batch?.includes('聯名')));
-    const badge = batch ? '<span class="edition edition-batch">' + esc(batch) + '</span>' : '';
-    return badge + genericTags.map(tag => '<span class="edition">' + esc(tag) + '</span>').join('');
-  }
   function card(item) {
     const status = C.favoriteStatus(state, item.id);
-    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(item.imageSpecification || item.specification || '规格待补') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + cardTags(item) + '</div></button>';
+    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(item.imageSpecification || item.specification || '规格待补') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + tags(item, true) + '</div></button>';
   }
   function catalogMarkup() {
     const items = C.homeCatalog(state, filters);
@@ -72,13 +72,14 @@
   }
   function historyMarkupFor(chip) {
     const link = (url,text) => safeSource(url) ? ' <a target="_blank" rel="noopener noreferrer" href="' + esc(url) + '">' + text + ' ↗</a>' : '';
-    return (chip.releaseBatch ? '<p class="source-note">' + esc(chip.releaseBatch) + link(chip.releaseBatchSourceUrl,'批次来源') + '</p>' : '') + (chip.timelineSource ? '<p class="description">时间线参考：' + esc(chip.timelineRecordId) + ' · ' + esc(chip.timelineSource) + '。' + esc(chip.timelineEvidence) + '。' + esc(chip.timelineNote) + '</p>' : '') + (chip.yearEvidence ? '<p class="description">' + esc(chip.yearEvidence) + (chip.yearEvidenceUrl === chip.releaseBatchSourceUrl ? '' : link(chip.yearEvidenceUrl,'年份依据')) + '</p>' : '') + (chip.historyNote ? '<p class="description">' + esc(chip.historyNote) + link(chip.historyUrl,'历史资料') + '</p>' : '');
+    const batchSource = link(chip.releaseBatchSourceUrl,'批次来源');
+    return (batchSource ? '<p class="source-note">' + batchSource + '</p>' : '') + (chip.timelineSource ? '<p class="description">时间线参考：' + esc(chip.timelineRecordId) + ' · ' + esc(chip.timelineSource) + '。' + esc(chip.timelineEvidence) + '。' + esc(chip.timelineNote) + '</p>' : '') + (chip.yearEvidence ? '<p class="description">' + esc(chip.yearEvidence) + (chip.yearEvidenceUrl === chip.releaseBatchSourceUrl ? '' : link(chip.yearEvidenceUrl,'年份依据')) + '</p>' : '') + (chip.historyNote ? '<p class="description">' + esc(chip.historyNote) + link(chip.historyUrl,'历史资料') + '</p>' : '');
   }
   function detailMarkup() {
     const chip = state.chips.find(c => c.id === route.id);
     if (!chip) return '<main class="page">' + header('图鉴详情') + empty('图鉴不存在', '返回列表后再试。') + '</main>';
     const status = C.favoriteStatus(state, chip.id), isAdmin = C.user(state).role !== 'user';
-    return '<main class="page" data-screen-label="图鉴详情">' + header('图鉴详情', isAdmin ? button(icon('edit'), 'edit', 'back', 'data-id="' + esc(chip.id) + '" aria-label="编辑图鉴"') : '') + '<div class="detail-hero ' + (chip.sourceKind === 'official' ? 'official' : '') + '"><img src="' + esc(image(chip[side] || chip.coverImage)) + '" alt="' + esc(chip.name) + (side === 'backImage' ? '背面' : '正面') + '">' + button(icon('zoom'), 'zoom', 'zoom', 'aria-label="放大包装图片"') + '</div><div class="image-switch">' + button('正面', 'side', side === 'coverImage' ? 'active' : '', 'data-side="coverImage"') + (chip.backImage ? button('背面', 'side', side === 'backImage' ? 'active' : '', 'data-side="backImage"') : '') + '</div><article class="detail-info"><h1>' + esc(chip.name) + '</h1><div class="tag-row">' + tags(chip) + (chip.active === false ? '<span class="tag">已下架</span>' : '') + '</div><dl class="detail-fields">' + [['发行市场',chip.market],['包装年份',chip.year || '待核实'],['口味首见',chip.firstSeenYear ? chip.firstSeenYear + '年' + (chip.firstSeenProvisional ? '（待核）' : '') : chip.flavorDocumentedYear ? chip.flavorDocumentedYear + '年' : '待核实'],['产品系列',chip.series || '待补充'],['包装形态',chip.packagingForm],['图示规格',chip.imageSpecification || chip.specification || '待补充'],['已知规格',chip.specification || '待补充'],['口味',chip.flavor || '待补充']].map(([k,v]) => '<div><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>').join('') + '</dl>' + (chip.description ? '<p class="description">' + esc(chip.description) + '</p>' : '') + (safeSource(chip.sourceUrl) ? '<p class="source-note">图片来源：<a target="_blank" rel="noopener noreferrer" href="' + esc(chip.sourceUrl) + '">' + esc(chip.sourceLabel || '素材来源') + ' ↗</a></p>' : '') + '' + historyMarkupFor(chip) + (PUBLIC || chip.active === false ? '' : button(icon('upload') + '补充包装图片','contribute','btn secondary full','data-id="' + esc(chip.id) + '"')) + '</article></main><div class="sticky-actions"><div class="action-row">' + (chip.active === false ? (status ? button('取消收藏', 'favorite', 'btn secondary full', 'data-status=""') : '<p class="form-hint">这款图鉴已下架。</p>') : button(icon('check') + (status === 'owned' ? '已拥有 ✓' : '标记拥有'), 'favorite', 'btn ' + (status === 'owned' ? 'on-owned' : 'secondary'), 'data-status="owned"') + button(icon('heart') + (status === 'wanted' ? '已加入心愿' : '想要收藏'), 'favorite', 'btn ' + (status === 'wanted' ? 'on-wanted' : ''), 'data-status="wanted"')) + '</div></div>';
+    return '<main class="page" data-screen-label="图鉴详情">' + header('图鉴详情', isAdmin ? button(icon('edit'), 'edit', 'back', 'data-id="' + esc(chip.id) + '" aria-label="编辑图鉴"') : '') + '<div class="detail-hero ' + (chip.sourceKind === 'official' ? 'official' : '') + '"><img src="' + esc(image(chip[side] || chip.coverImage)) + '" alt="' + esc(chip.name) + (side === 'backImage' ? '背面' : '正面') + '">' + button(icon('zoom'), 'zoom', 'zoom', 'aria-label="放大包装图片"') + '</div><div class="image-switch">' + button('正面', 'side', side === 'coverImage' ? 'active' : '', 'data-side="coverImage"') + (chip.backImage ? button('背面', 'side', side === 'backImage' ? 'active' : '', 'data-side="backImage"') : '') + '</div><article class="detail-info"><h1>' + esc(chip.name) + '</h1><div class="tag-row">' + tags(chip) + (chip.active === false ? '<span class="tag">已下架</span>' : '') + '</div><dl class="detail-fields">' + [['发行市场',chip.market],['包装年份',chip.year || '待核实'],['口味首见',chip.firstSeenYear ? chip.firstSeenYear + '年' + (chip.firstSeenProvisional ? '（待核）' : '') : chip.flavorDocumentedYear ? chip.flavorDocumentedYear + '年' : '待核实'],...(chip.series ? [['产品系列',chip.series]] : []),['包装形态',chip.packagingForm],['图示规格',chip.imageSpecification || chip.specification || '待补充'],['已知规格',chip.specification || '待补充'],['口味',chip.flavor || '待补充']].map(([k,v]) => '<div><dt>' + k + '</dt><dd>' + esc(v) + '</dd></div>').join('') + '</dl>' + (chip.description ? '<p class="description">' + esc(chip.description) + '</p>' : '') + (safeSource(chip.sourceUrl) ? '<p class="source-note">图片来源：<a target="_blank" rel="noopener noreferrer" href="' + esc(chip.sourceUrl) + '">' + esc(chip.sourceLabel || '素材来源') + ' ↗</a></p>' : '') + '' + historyMarkupFor(chip) + (PUBLIC || chip.active === false ? '' : button(icon('upload') + '补充包装图片','contribute','btn secondary full','data-id="' + esc(chip.id) + '"')) + '</article></main><div class="sticky-actions"><div class="action-row">' + (chip.active === false ? (status ? button('取消收藏', 'favorite', 'btn secondary full', 'data-status=""') : '<p class="form-hint">这款图鉴已下架。</p>') : button(icon('check') + (status === 'owned' ? '已拥有 ✓' : '标记拥有'), 'favorite', 'btn ' + (status === 'owned' ? 'on-owned' : 'secondary'), 'data-status="owned"') + button(icon('heart') + (status === 'wanted' ? '已加入心愿' : '想要收藏'), 'favorite', 'btn ' + (status === 'wanted' ? 'on-wanted' : ''), 'data-status="wanted"')) + '</div></div>';
   }
   function option(value, label, selected) { return '<option value="' + esc(value) + '"' + (String(selected) === String(value) ? ' selected' : '') + '>' + esc(label) + '</option>'; }
   function fieldsMarkup(data) {
@@ -116,16 +117,19 @@
     for (const key of ['name','market','year','packagingForm','flavor','specification','description','reviewRemark','duplicateId']) if (data.has(key)) draft[key] = String(data.get(key));
     draft.tags = data.getAll('tags');
   }
+  function pageScroll() { return root.querySelector('.page')?.scrollTop || 0; }
   function go(name, args) {
     if (['catalog','favorites','profile'].includes(name)) trail = [];
-    else trail.push(route);
+    else trail.push({route, scrollTop: pageScroll()});
     route = Object.assign({name},args || {}); side = 'coverImage'; sheet = null;
     draft = null; if (['submit','edit','review'].includes(name)) prepareDraft();
     render();
   }
   function back(force) {
-    if (!force && draft?.modified) { updateDraft(); sheet = {type:'discard'}; return render(true); }
-    route = trail.pop() || {name:'catalog'}; draft = null; sheet = null; side = 'coverImage'; render();
+    if (!force && draft?.modified) { updateDraft(); sheet = {type:'discard'}; return render(pageScroll()); }
+    const previous = trail.pop();
+    route = previous?.route || {name:'catalog'}; draft = null; sheet = null; side = 'coverImage';
+    render(previous?.scrollTop);
   }
   function sheetMarkup() {
     if (!sheet) return '';
@@ -153,18 +157,17 @@
     }
     return '<div class="overlay" data-action="overlay-close"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title">' + title + '</h2>' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭弹窗"') + '</div>' + content + '</section></div>';
   }
-  function render(preserveScroll) {
-    const scroll = preserveScroll ? root.querySelector('.page')?.scrollTop || 0 : 0;
+  function render(scrollTop = 0) {
     const functions = {catalog:catalogMarkup,favorites:favoritesMarkup,profile:profileMarkup,detail:detailMarkup,submit:editorMarkup,edit:editorMarkup,review:editorMarkup,history:historyMarkup,admin:adminMarkup};
     root.innerHTML = (functions[route.name] || catalogMarkup)() + sheetMarkup();
-    const page = root.querySelector('.page'); if (page) { page.scrollTop = scroll; if (sheet) page.setAttribute('inert',''); }
+    const page = root.querySelector('.page'); if (page) { page.scrollTop = scrollTop; if (sheet) page.setAttribute('inert',''); }
     if (sheet) { root.querySelector('.bottom-nav')?.setAttribute('inert',''); root.querySelector('.sticky-actions')?.setAttribute('inert',''); root.querySelector('.sheet-close')?.focus({preventScroll:true}); }
     document.title = '薯片袋图鉴 · ' + ({catalog:'图鉴',favorites:'我的收藏',profile:'我的'}[route.name] || '本地体验');
   }
   async function write(transform, message, redraw = true) {
     if (busy) return false;
     busy = true;
-    try { state = await R.mutate(transform); if (redraw) render(true); if (message) toast(message); return true; }
+    try { state = await R.mutate(transform); if (redraw) render(pageScroll()); if (message) toast(message); return true; }
     catch (error) { toast(error.message); return false; }
     finally { busy = false; }
   }
@@ -181,16 +184,16 @@
     const el = event.target.closest('[data-action]'); if (!el || busy) return;
     const a = el.dataset.action, id = el.dataset.id;
     if (a === 'overlay-close' && event.target !== el) return;
-    if (['close-sheet','overlay-close'].includes(a)) { sheet = null; return render(true); }
+    if (['close-sheet','overlay-close'].includes(a)) { sheet = null; return render(pageScroll()); }
     if (a === 'nav') return go(el.dataset.name);
     if (a === 'back') return back();
     if (a === 'discard') return back(true);
     if (a === 'detail') return go('detail',{id});
-    if (a === 'side') { side = el.dataset.side; return render(true); }
-    if (a === 'zoom') { sheet = {type:'zoom'}; return render(true); }
-    if (a === 'filters') { sheet = {type:'filters'}; return render(true); }
+    if (a === 'side') { side = el.dataset.side; return render(pageScroll()); }
+    if (a === 'zoom') { sheet = {type:'zoom'}; return render(pageScroll()); }
+    if (a === 'filters') { sheet = {type:'filters'}; return render(pageScroll()); }
     if (a === 'clear-all') { filters = {search:'',tag:'',market:'',year:'',packagingForm:'',specification:'',series:'',releaseBatch:''}; return render(); }
-    if (a === 'reset-filters') { filters = {search:filters.search,tag:'',market:'',year:'',packagingForm:'',specification:'',series:'',releaseBatch:''}; return render(true); }
+    if (a === 'reset-filters') { filters = {search:filters.search,tag:'',market:'',year:'',packagingForm:'',specification:'',series:'',releaseBatch:''}; return render(pageScroll()); }
     if (a === 'favorite-tab') { favoriteTab = el.dataset.tab; return render(); }
     if (a === 'favorite') return write(s => C.setFavorite(s,route.id,C.favoriteStatus(s,route.id) === el.dataset.status ? '' : el.dataset.status),'收藏已更新');
     if (a === 'contribute') { if (PUBLIC) return; return go('submit',{targetChipId:id}); }
@@ -201,13 +204,13 @@
     if (a === 'admin-tab') { adminTab = el.dataset.tab; return render(); }
     if (a === 'edit' || a === 'new-chip') return go('edit',{id:id || ''});
     if (a === 'review') return go('review',{id});
-    if (a === 'submission-detail') { sheet = {type:'submission',id}; return render(true); }
-    if (a === 'toggle-active') { const chip = state.chips.find(c => c.id === id); if (!chip.active) return write(s => C.setActive(s,id,true),'图鉴已重新上架'); sheet = {type:'active',id}; return render(true); }
+    if (a === 'submission-detail') { sheet = {type:'submission',id}; return render(pageScroll()); }
+    if (a === 'toggle-active') { const chip = state.chips.find(c => c.id === id); if (!chip.active) return write(s => C.setActive(s,id,true),'图鉴已重新上架'); sheet = {type:'active',id}; return render(pageScroll()); }
     if (a === 'confirm-active') { sheet = null; return write(s => C.setActive(s,id,false),'图鉴已下架，收藏记录保留'); }
     if (a === 'stat') { if (el.dataset.name === 'history') return go('history'); favoriteTab = el.dataset.name; return go('favorites'); }
-    if (['about','visibility'].includes(a)) { sheet = {type:a}; return render(true); }
-    if (a === 'reason') { updateDraft(); draft.reviewRemark = el.dataset.reason; draft.modified = true; return render(true); }
-    if (a === 'remove-back') { updateDraft(); draft.backImage = ''; draft.modified = true; return render(true); }
+    if (['about','visibility'].includes(a)) { sheet = {type:a}; return render(pageScroll()); }
+    if (a === 'reason') { updateDraft(); draft.reviewRemark = el.dataset.reason; draft.modified = true; return render(pageScroll()); }
+    if (a === 'remove-back') { updateDraft(); draft.backImage = ''; draft.modified = true; return render(pageScroll()); }
     if (a === 'reject') {
       updateDraft();
       try {
@@ -232,7 +235,7 @@
       const success = await write(operation,'',false);
       if (success) {
         const previous = route.name; draft = null;
-        if (previous === 'submit') { trail = [{name:'catalog'}]; route = {name:'history'}; render(); toast('投稿已提交，等待管理员审核'); }
+        if (previous === 'submit') { trail = [{route:{name:'catalog'},scrollTop:0}]; route = {name:'history'}; render(); toast('投稿已提交，等待管理员审核'); }
         else { back(true); toast(previous === 'review' ? '已收录到公共图鉴' : '图鉴已保存'); }
       }
     } catch (error) { errorElement.textContent = error.message; errorElement.scrollIntoView({block:'nearest'}); }
@@ -249,14 +252,14 @@
     if (input.dataset.image && input.files?.[0]) {
       const currentDraft = draft, key = input.dataset.image;
       busy = true;
-      try { const encoded = await loadImage(input.files[0]); if (draft !== currentDraft) return; draft[key] = encoded; draft.modified = true; render(true); }
+      try { const encoded = await loadImage(input.files[0]); if (draft !== currentDraft) return; draft[key] = encoded; draft.modified = true; render(pageScroll()); }
       catch (e) { toast(e.message); input.value = ''; }
       finally { busy = false; }
     }
 
   });
   root.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && sheet) { sheet = null; render(true); }
+    if (event.key === 'Escape' && sheet) { sheet = null; render(pageScroll()); }
     if (event.key === 'Tab' && sheet) {
       const focusable = [...root.querySelectorAll('[role="dialog"] button,[role="dialog"] select,[role="dialog"] input')].filter(e => !e.disabled);
       const index = focusable.indexOf(document.activeElement);
@@ -267,7 +270,7 @@
   window.addEventListener('beforeunload', event => { if (draft?.modified) { event.preventDefault(); event.returnValue = ''; } });
   R.onExternalChange(async () => {
     if (draft?.modified || busy) { toast('另一页面更新了数据，保存时会使用最新记录'); return; }
-    state = await R.read(); render(true);
+    state = await R.read(); render(pageScroll());
   });
   R.initialize().then(data => { state = data; render(); }).catch(error => {
     root.innerHTML = '<main class="error-screen"><h2>暂时无法打开图鉴</h2><p>' + esc(error.message) + '</p><p>如果此前使用过，请保留当前浏览器数据，先检查存储权限。</p><button class="btn" id="retry">重新打开</button></main>';

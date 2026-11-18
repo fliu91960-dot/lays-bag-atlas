@@ -1,5 +1,5 @@
 {
-  "revision": 37,
+  "revision": 38,
   "updatedAt": "2026-11-18",
   "products": [
     {
@@ -1358,7 +1358,7 @@
       "name": "京酱烤鸭味",
       "market": "中国大陆",
       "year": null,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -1657,7 +1657,7 @@
       "name": "临沂炒鸡味",
       "market": "中国大陆",
       "year": 2022,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -1684,7 +1684,7 @@
       "packagingVersion": "2 版；2022 / 2024；None",
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2022 地域限定·9月",
+      "releaseBatch": "2022 城市限定·9月",
       "releaseBatchYear": 2022,
       "releaseBatchSourceUrl": "https://www.foodaily.com/new_products/1418",
       "releaseBatchOrder": 18,
@@ -1702,7 +1702,7 @@
       "name": "单县羊汤味",
       "market": "中国大陆",
       "year": 2023,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -1729,7 +1729,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2023 地域限定·5月",
+      "releaseBatch": "2023 城市限定·5月",
       "releaseBatchYear": 2023,
       "releaseBatchSourceUrl": "https://www.ganhuoku.cn/archives/202749",
       "releaseBatchOrder": 16,
@@ -1749,7 +1749,7 @@
       "name": "淄博烧烤味",
       "market": "中国大陆",
       "year": 2023,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -1776,7 +1776,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2023 淄博限定",
+      "releaseBatch": "2023 城市限定·淄博",
       "releaseBatchYear": 2023,
       "releaseBatchSourceUrl": "https://www.foodaily.com/new_products/2067",
       "releaseBatchOrder": 15,
@@ -1794,7 +1794,7 @@
       "name": "驴肉火烧味",
       "market": "中国大陆",
       "year": 2023,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -1821,7 +1821,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2023 地域限定·5月",
+      "releaseBatch": "2023 城市限定·5月",
       "releaseBatchYear": 2023,
       "releaseBatchSourceUrl": "https://www.ganhuoku.cn/archives/202749",
       "releaseBatchOrder": 16,
@@ -2010,7 +2010,7 @@
       "name": "辣卤鸡爪味",
       "market": "中国大陆",
       "year": 2022,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -2037,7 +2037,7 @@
       "packagingVersion": "2 版；2022 / 2023；None",
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2022 地域限定·9月",
+      "releaseBatch": "2022 城市限定·9月",
       "releaseBatchYear": 2022,
       "releaseBatchSourceUrl": "https://www.foodaily.com/new_products/1418",
       "releaseBatchOrder": 18,
@@ -2187,7 +2187,7 @@
       "name": "深井烧鹅味",
       "market": "中国大陆",
       "year": 2022,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -2214,7 +2214,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2022 地域限定·9月",
+      "releaseBatch": "2022 城市限定·9月",
       "releaseBatchYear": 2022,
       "releaseBatchSourceUrl": "https://www.foodaily.com/new_products/1418",
       "releaseBatchOrder": 18,
@@ -2601,7 +2601,7 @@
       "name": "棒骨炖酸菜味",
       "market": "中国大陆",
       "year": 2024,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -2628,7 +2628,7 @@
       "packagingVersion": "2 版；2024；一版标「限定口味」，一版改为「建议零售价 5.8 元」并降至 65g",
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2024 地域限定",
+      "releaseBatch": "2024 城市限定",
       "releaseBatchYear": 2024,
       "releaseBatchSourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
       "releaseBatchOrder": 13,
@@ -2646,7 +2646,7 @@
       "name": "煎饼卷大葱味",
       "market": "中国大陆",
       "year": 2024,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -2673,7 +2673,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2024 地域限定",
+      "releaseBatch": "2024 城市限定",
       "releaseBatchYear": 2024,
       "releaseBatchSourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
       "releaseBatchOrder": 13,
@@ -2691,7 +2691,7 @@
       "name": "牛肉板面味",
       "market": "中国大陆",
       "year": 2024,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -2718,7 +2718,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2024 地域限定",
+      "releaseBatch": "2024 城市限定",
       "releaseBatchYear": 2024,
       "releaseBatchSourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
       "releaseBatchOrder": 13,
@@ -2736,7 +2736,7 @@
       "name": "螺蛳粉味",
       "market": "中国大陆",
       "year": 2024,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "联名",
@@ -2764,7 +2764,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2024 地域限定",
+      "releaseBatch": "2024 城市限定",
       "releaseBatchYear": 2024,
       "releaseBatchSourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
       "releaseBatchOrder": 13,
@@ -2782,7 +2782,7 @@
       "name": "遵义羊肉粉味",
       "market": "中国大陆",
       "year": 2024,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -2809,7 +2809,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2024 地域限定",
+      "releaseBatch": "2024 城市限定",
       "releaseBatchYear": 2024,
       "releaseBatchSourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
       "releaseBatchOrder": 13,
@@ -3163,7 +3163,7 @@
       "name": "油泼辣子味",
       "market": "中国大陆",
       "year": null,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -3201,7 +3201,7 @@
       "name": "经典啤酒味",
       "market": "中国大陆",
       "year": 2025,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "联名",
@@ -3247,7 +3247,7 @@
       "name": "锅包肉味",
       "market": "中国大陆",
       "year": null,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -3876,7 +3876,7 @@
       "name": "见手青味",
       "market": "中国大陆",
       "year": 2026,
-      "series": "区域限定",
+      "series": "",
       "tags": [
         "限定",
         "城市限定"
@@ -3903,7 +3903,7 @@
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
       "updateTime": "2026-11-17T00:00:00.000Z",
-      "releaseBatch": "2026 云南限定",
+      "releaseBatch": "2026 城市限定·云南",
       "releaseBatchYear": 2026,
       "releaseBatchSourceUrl": "https://www.xinyingyang.com/content-13-29850-1.html",
       "releaseBatchOrder": 1,
