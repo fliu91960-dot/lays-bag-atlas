@@ -1,17 +1,19 @@
 /* Public demo: the catalogue ships with the site; each visitor keeps their own browser data. */
 (function () {
   'use strict';
-  let database, identity;
+  let database, identity, preview;
   const C = window.AtlasCore;
   const updates = typeof BroadcastChannel === 'function' ? new BroadcastChannel('chips-atlas-public-v1') : null;
   function bind(value) { return C.bindIdentity(C.migrateState(value || C.initialState()), {id:identity,role:'user'}); }
   function read() {
+    if (preview) return Promise.resolve(preview);
     return new Promise((resolve,reject) => {
       const request = database.transaction('state','readonly').objectStore('state').get('root');
       request.onsuccess = () => resolve(bind(request.result)); request.onerror = () => reject(request.error);
     });
   }
   function mutate(transform) {
+    if (preview) return Promise.reject(new Error('浏览器未开放存储，允许本站保存数据后即可收藏'));
     return new Promise((resolve,reject) => {
       const transaction = database.transaction('state','readwrite'), store = transaction.objectStore('state');
       const request = store.get('root'); let next, failure;
@@ -20,7 +22,7 @@
       transaction.onabort = transaction.onerror = () => reject(failure || new Error('保存失败，请检查浏览器的存储空间'));
     });
   }
-  async function initialize() {
+  async function openStorage() {
     identity = localStorage.getItem('chips-atlas-visitor-v1');
     if (!/^local-[a-f0-9]{24}$/.test(identity || '')) {
       identity = 'local-' + Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2,'0')).join('');
@@ -32,23 +34,33 @@
       request.onsuccess = () => { database = request.result; database.onversionchange = () => database.close(); resolve(); };
       request.onerror = () => reject(new Error('请允许浏览器保存收藏数据后重试'));
     });
-    let catalogue;
+  }
+  async function initialize() {
+    try { await openStorage(); } catch (_) {
+      // A visitor can still browse the shipped atlas when browser storage is disabled.
+      preview = C.initialState();
+      preview.favorites = [];
+      return preview;
+    }
+    const shipped = C.initialState();
+    let catalogue = C.catalog(shipped);
     if (location.protocol !== 'file:') {
       try {
         const response = await fetch('./catalogue.json', {cache:'no-store'});
         if (response.ok) {
           const data = await response.json();
-          if (Array.isArray(data.products) && data.products.length && new Set(data.products.map(c=>c.id)).size === data.products.length) catalogue = data.products;
+          if (data.revision === shipped.fixtureRevision && Array.isArray(data.products) && data.products.length && new Set(data.products.map(c=>c.id)).size === data.products.length) catalogue = data.products;
         }
       } catch (_) { /* Shipped catalogue remains available when the data file is unreachable. */ }
     }
     return mutate(value => {
-      if (catalogue) {
-        const ids = new Set(catalogue.map(c=>c.id));
-        value.chips = C.clone(catalogue).concat(value.chips.filter(c=>!ids.has(c.id)));
-      }
+      const ids = new Set(catalogue.map(c=>c.id));
+      const retired = value.chips.filter(c=>!ids.has(c.id)).map(c=>({
+        ...c, active:false, imagePending:true, coverImage:'assets/unknown.png', backImage:''
+      }));
+      value.chips = C.clone(catalogue).concat(retired);
       return C.validateState(value);
     });
   }
-  window.AtlasRepository = {publicMode:true,initialize,read,mutate,onExternalChange:callback => { if (updates) updates.onmessage = callback; }};
+  window.AtlasRepository = {publicMode:true,get readOnly(){return Boolean(preview);},initialize,read,mutate,onExternalChange:callback => { if (updates) updates.onmessage = callback; }};
 })();

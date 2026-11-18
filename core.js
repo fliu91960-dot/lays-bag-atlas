@@ -197,17 +197,26 @@
       flavor: String(input.flavor || '').trim(), specification: String(input.specification || '').trim(),
       description: String(input.description || '').trim(), coverImage: input.coverImage || '', backImage: input.backImage || '' };
   }
+  function packageWeights(item) {
+    const grams = text => [...new Set(Array.from(String(text || '').matchAll(/(\d+(?:\.\d+)?)\s*(?:g\b|克)/gi), match => Number(match[1]) + 'g'))];
+    const pictured = grams(item.imageSpecification);
+    return pictured.length ? pictured : grams(item.specification);
+  }
   function catalog(state, filters) {
     const f = filters || {};
-    const search = String(f.search || '').trim().toLowerCase();
+    const words = String(f.search || '').trim().toLowerCase().split(/\s+/).filter(Boolean);
     return state.chips.filter(item => item.active !== false)
-      .filter(item => !search || item.name.toLowerCase().includes(search))
+      .filter(item => {
+        if (!words.length) return true;
+        const text = [item.name, item.flavor, item.series, item.releaseBatch, ...item.tags].join(' ').toLowerCase();
+        return words.every(word => text.includes(word));
+      })
       .filter(item => !f.market || item.market === f.market)
       .filter(item => !f.year || (f.year === 'unknown' ? item.year === null : String(item.year) === String(f.year)))
       .filter(item => !f.packagingForm || item.packagingForm === f.packagingForm)
       .filter(item => !f.series || item.series === f.series)
       .filter(item => !f.releaseBatch || item.releaseBatch === f.releaseBatch)
-      .filter(item => !f.specification || item.specification.replace(/\s+/g,'').toLowerCase() === f.specification)
+      .filter(item => !f.specification || packageWeights(item).includes(f.specification))
       .filter(item => !f.tag || (f.tag === '常规' ? item.tags.length === 0 :
         item.tags.includes(f.tag) || (f.tag === '限定' && item.tags.includes('城市限定'))));
   }
@@ -298,15 +307,15 @@
       assert(index !== -1, '图鉴不存在');
       if (next.chips[index].coverImage !== data.coverImage) {
         next.chips[index].sourceKind = 'upload';
-        next.chips[index].imageSpecification = data.specification;
+        next.chips[index].imageSpecification = '';
         next.chips[index].previousSourceUrl = next.chips[index].sourceUrl || '';
         delete next.chips[index].sourceUrl;
         delete next.chips[index].sourceImageUrl;
         delete next.chips[index].sourceLabel;
-        for (const key of ['yearEvidence','yearEvidenceUrl','historyNote','historyUrl','flavorDocumentedYear']) delete next.chips[index][key];
       }
       if (next.chips[index].year !== data.year) { delete next.chips[index].yearEvidence; delete next.chips[index].yearEvidenceUrl; }
-      next.chips[index] = Object.assign(next.chips[index], data, { imagePending: false, updatedBy: state.currentUserId, updateTime: now() });
+      const imagePending = !!next.chips[index].imagePending && next.chips[index].coverImage === data.coverImage;
+      next.chips[index] = Object.assign(next.chips[index], data, { imagePending, updatedBy: state.currentUserId, updateTime: now() });
     } else next.chips.unshift(Object.assign(data, { id: uid('chip'), active: true, isDemo: false, createdBy: state.currentUserId, createTime: now(), updateTime: now() }));
     return next;
   }
@@ -344,6 +353,6 @@
     for (const submission of value.submissions) { assert(submission && ['pending', 'approved', 'rejected'].includes(submission.status) && users.has(submission.userId) && typeof submission.id === 'string' && /^[a-zA-Z0-9_-]+$/.test(submission.id) && !submissionIds.has(submission.id), '备份投稿格式不正确'); cleanFields(submission, true); assert(submission.status !== 'approved' || seen.has(submission.chipId), '备份投稿缺少已收录图鉴'); assert(!submission.chipId || seen.has(submission.chipId), '备份投稿关联不存在'); assert(typeof submission.reviewRemark === 'string' && submission.reviewRemark.length <= 300, '审核说明格式不正确'); submissionIds.add(submission.id); }
     return clone(value);
   }
-  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, initialState, migrateState, bindIdentity, clone, user, catalog, homeCatalog, favorites, favoriteStatus, setFavorite,
+  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, homeCatalog, favorites, favoriteStatus, setFavorite,
     submit, ownSubmissions, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, validateState };
 });
