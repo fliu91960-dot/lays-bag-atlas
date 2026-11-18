@@ -241,24 +241,46 @@
       .map(item => { const chip = state.chips.find(chip => chip.id === item.chipId); return chip ? Object.assign({}, chip, { favoriteStatus: item.status }) : null; })
       .filter(Boolean);
   }
-  function setFavorite(state, chipId, status) {
+  function setFavorite(state, chipId, status, removeOnlyIf) {
     assert(['', 'owned', 'wanted'].includes(status), '收藏状态不正确');
     assert(state.chips.some(item => item.id === chipId && (!status || item.active !== false)), '这款图鉴已下架或不存在');
+    const current = favoriteStatus(state, chipId);
+    if (current === status || (!status && removeOnlyIf && current !== removeOnlyIf)) return state;
     const next = clone(state);
     next.favorites = next.favorites.filter(item => !(item.userId === next.currentUserId && item.chipId === chipId));
     if (status) next.favorites.push({ userId: next.currentUserId, chipId, status, updateTime: now() });
     return next;
   }
-  function submit(state, fields) {
+  const FIELD_NAMES = Object.freeze({name:'名称',market:'市场',year:'包装年份',packagingForm:'包装形态',
+    tags:'款式',flavor:'口味',specification:'规格',description:'说明',coverImage:'正面图',backImage:'背面图'});
+  function sameField(key, left, right) {
+    return key === 'tags' ? left.length === right.length && left.every(tag => right.includes(tag)) : left === right;
+  }
+  function submit(state, fields, openedTarget) {
     const data = cleanFields(fields, true);
     const targetChipId = String(fields.targetChipId || '');
-    assert(!targetChipId || state.chips.some(c => c.id === targetChipId && c.active !== false), '要补图的图鉴不存在或已下架');
+    const target = targetChipId && state.chips.find(c => c.id === targetChipId && c.active !== false);
+    assert(!targetChipId || target, '要补图的图鉴不存在或已下架');
+    if (target) {
+      const baseline = cleanFields(openedTarget || target, false);
+      data.proposedFields = Object.keys(baseline).filter(key => key !== 'coverImage' && key !== 'backImage' && !sameField(key,baseline[key],data[key]));
+    }
     const next = clone(state);
     next.submissions.unshift(Object.assign(data, { id: uid('submission'), userId: state.currentUserId,
       targetChipId, status: 'pending', reviewRemark: '', chipId: '', createTime: now(), updateTime: now() }));
     return next;
   }
   function ownSubmissions(state) { return state.submissions.filter(item => item.userId === state.currentUserId); }
+  function reviewFields(record, target) {
+    if (!target) return cleanFields(record,true);
+    const fields = cleanFields(target,true);
+    for (const key of record.proposedFields || []) {
+      if (Object.hasOwn(fields,key) && key !== 'coverImage' && key !== 'backImage') fields[key] = record[key];
+    }
+    fields.coverImage = record.coverImage;
+    fields.backImage = record.backImage || fields.backImage;
+    return fields;
+  }
   function review(state, id, decision, options) {
     requireAdmin(state);
     assert(['approved', 'rejected'].includes(decision), '审核状态不正确');
@@ -269,22 +291,33 @@
     assert(record.status === 'pending', '该投稿已处理，请刷新查看');
     const opts = options || {};
     if (decision === 'approved') {
-      const fields = cleanFields(opts.fields || record, true);
       if (record.targetChipId) {
         const target = next.chips.find(c => c.id === record.targetChipId && c.active !== false);
         assert(target, '要补图的图鉴已下架，请先处理图鉴状态');
-        if (!fields.backImage) fields.backImage = target.backImage || '';
-        next.chips = saveChip(next, record.targetChipId, fields).chips;
+        let fields = reviewFields(record,target);
+        if (opts.fields) {
+          const reviewed = cleanFields(opts.fields,true);
+          if (opts.baseline) fields = reviewed;
+          else {
+            const submitted = cleanFields(record,true);
+            for (const key of Object.keys(reviewed)) {
+              if (!sameField(key,reviewed[key],submitted[key])) fields[key] = reviewed[key];
+            }
+          }
+        }
+        if (!fields.backImage && !opts.baseline) fields.backImage = target.backImage || '';
+        next.chips = saveChip(next, record.targetChipId, fields, opts.baseline).chips;
         const chip = next.chips.find(c => c.id === record.targetChipId);
         chip.sourceSubmissionId = record.id;
         record.chipId = chip.id;
       } else {
-      const chipId = 'submission-chip-' + record.id;
-      assert(!next.chips.some(chip => chip.id === chipId), '该投稿已经收录');
-      // Strings are immutable in the local demo. Cloud mode must copy files before publication.
-      next.chips.unshift(Object.assign(fields, { id: chipId, active: true, isDemo: false,
-        sourceSubmissionId: record.id, createdBy: state.currentUserId, createTime: now(), updateTime: now() }));
-      record.chipId = chipId;
+        const fields = cleanFields(opts.fields || record,true);
+        const chipId = 'submission-chip-' + record.id;
+        assert(!next.chips.some(chip => chip.id === chipId), '该投稿已经收录');
+        // Strings are immutable in the local demo. Cloud mode must copy files before publication.
+        next.chips.unshift(Object.assign(fields, { id: chipId, active: true, isDemo: false,
+          sourceSubmissionId: record.id, createdBy: state.currentUserId, createTime: now(), updateTime: now() }));
+        record.chipId = chipId;
       }
     } else {
       assert(String(opts.remark || '').trim(), '请填写驳回原因');
@@ -298,13 +331,22 @@
     record.updateTime = now();
     return next;
   }
-  function saveChip(state, id, fields) {
+  function saveChip(state, id, fields, openedChip) {
     requireAdmin(state);
     const data = cleanFields(fields, true);
     const next = clone(state);
     if (id) {
       const index = next.chips.findIndex(item => item.id === id);
       assert(index !== -1, '图鉴不存在');
+      if (openedChip) {
+        const baseline = cleanFields(openedChip,true), current = cleanFields(next.chips[index],true);
+        for (const key of Object.keys(current)) {
+          if (sameField(key, data[key], baseline[key])) data[key] = current[key];
+          else if (!sameField(key, current[key], baseline[key]) && !sameField(key, data[key], current[key])) {
+            throw new Error('「' + FIELD_NAMES[key] + '」已被另一页面修改。请返回重新打开，核对最新值后保存。');
+          }
+        }
+      }
       if (next.chips[index].coverImage !== data.coverImage) {
         next.chips[index].sourceKind = 'upload';
         next.chips[index].imageSpecification = '';
@@ -353,6 +395,6 @@
     for (const submission of value.submissions) { assert(submission && ['pending', 'approved', 'rejected'].includes(submission.status) && users.has(submission.userId) && typeof submission.id === 'string' && /^[a-zA-Z0-9_-]+$/.test(submission.id) && !submissionIds.has(submission.id), '备份投稿格式不正确'); cleanFields(submission, true); assert(submission.status !== 'approved' || seen.has(submission.chipId), '备份投稿缺少已收录图鉴'); assert(!submission.chipId || seen.has(submission.chipId), '备份投稿关联不存在'); assert(typeof submission.reviewRemark === 'string' && submission.reviewRemark.length <= 300, '审核说明格式不正确'); submissionIds.add(submission.id); }
     return clone(value);
   }
-  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, homeCatalog, favorites, favoriteStatus, setFavorite,
-    submit, ownSubmissions, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, validateState };
+  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, homeCatalog, favorites, favoriteStatus, setFavorite,
+    submit, ownSubmissions, reviewFields, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, validateState };
 });

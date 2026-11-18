@@ -80,3 +80,6 @@ body { display: block; background: var(--bg); }
   .chip-card:hover h3 { text-decoration: underline; text-underline-offset: 3px; }
   .chip-card:hover .chip-art { border-color: #aba18b; }
 }
+.review-diff { width: 100%; margin-top: 8px; table-layout: fixed; border-collapse: collapse; color: var(--ink); font-size: 13px; }
+.review-diff th, .review-diff td { padding: 6px 4px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.review-diff th:first-child { width: 22%; }
