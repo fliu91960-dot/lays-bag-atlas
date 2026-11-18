@@ -37,7 +37,10 @@
   function header(title, end) { return '<header class="sub-header">' + button(icon('back'), 'back', 'back', 'aria-label="返回"') + '<h2>' + esc(title) + '</h2>' + (end ? '<div class="header-end">' + end + '</div>' : '') + '</header>'; }
   function navigation() { return '<nav class="bottom-nav" aria-label="主要导航">' + [['catalog','grid','图鉴'],['favorites','bookmark','我的收藏'],['profile','user','我的']].map(([name, i, text]) => button('<span class="nav-icon">' + icon(i) + '</span><span>' + text + '</span>', 'nav', route.name === name ? 'active' : '', 'data-name="' + name + '" aria-current="' + (route.name === name ? 'page' : 'false') + '"')).join('') + '</nav>'; }
   function empty(title, message, action) { return '<div class="empty">' + icon('bag') + '<strong>' + esc(title) + '</strong><p>' + esc(message) + '</p>' + (action || '') + '</div>'; }
-  function tags(item) { return item.tags.length ? item.tags.map(t => '<span class="tag">' + esc(t) + '</span>').join('') : '<span class="tag">常规</span>'; }
+  function visibleTags(item) {
+    return item.tags.includes('城市限定') ? item.tags.filter(tag => tag !== '限定') : item.tags;
+  }
+  function tags(item) { return item.tags.length ? visibleTags(item).map(t => '<span class="tag">' + esc(t) + '</span>').join('') : '<span class="tag">常规</span>'; }
   function yearLabel(item) {
     if (item.year) return '包装：' + item.year + '年';
     const year = item.firstSeenYear || item.flavorDocumentedYear;
@@ -45,7 +48,7 @@
   }
   function cardTags(item) {
     const batch = item.releaseBatch;
-    const genericTags = item.tags.filter(tag => !batch?.includes(tag) && !(tag === '联名' && batch?.includes('聯名')));
+    const genericTags = visibleTags(item).filter(tag => !batch?.includes(tag) && !(tag === '联名' && batch?.includes('聯名')));
     const badge = batch ? '<span class="edition edition-batch">' + esc(batch) + '</span>' : '';
     return badge + genericTags.map(tag => '<span class="edition">' + esc(tag) + '</span>').join('');
   }

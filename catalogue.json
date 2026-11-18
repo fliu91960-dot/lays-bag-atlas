@@ -1,5 +1,5 @@
 {
-  "revision": 36,
+  "revision": 37,
   "updatedAt": "2026-11-18",
   "products": [
     {
@@ -1360,7 +1360,8 @@
       "year": null,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "京酱烤鸭味",
       "specification": "70g / 135g",
@@ -1658,7 +1659,8 @@
       "year": 2022,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "临沂炒鸡味",
       "specification": "70g",
@@ -1702,7 +1704,8 @@
       "year": 2023,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "单县羊汤味",
       "specification": "70g",
@@ -1748,7 +1751,8 @@
       "year": 2023,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "淄博烧烤味",
       "specification": "70g",
@@ -1792,7 +1796,8 @@
       "year": 2023,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "驴肉火烧味",
       "specification": "70g",
@@ -2007,7 +2012,8 @@
       "year": 2022,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "辣卤鸡爪味",
       "specification": "70g",
@@ -2183,7 +2189,8 @@
       "year": 2022,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "深井烧鹅味",
       "specification": "70g",
@@ -2596,7 +2603,8 @@
       "year": 2024,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "棒骨炖酸菜味",
       "specification": "70g / 65g",
@@ -2640,7 +2648,8 @@
       "year": 2024,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "煎饼卷大葱味",
       "specification": "70g",
@@ -2684,7 +2693,8 @@
       "year": 2024,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "牛肉板面味",
       "specification": "70g",
@@ -2729,7 +2739,8 @@
       "series": "区域限定",
       "tags": [
         "限定",
-        "联名"
+        "联名",
+        "城市限定"
       ],
       "flavor": "螺蛳粉味",
       "specification": "70g",
@@ -2773,7 +2784,8 @@
       "year": 2024,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "遵义羊肉粉味",
       "specification": "70g",
@@ -3153,7 +3165,8 @@
       "year": null,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "油泼辣子味",
       "specification": "70g",
@@ -3191,7 +3204,8 @@
       "series": "区域限定",
       "tags": [
         "限定",
-        "联名"
+        "联名",
+        "城市限定"
       ],
       "flavor": "经典啤酒味",
       "specification": "70g",
@@ -3235,7 +3249,8 @@
       "year": null,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "锅包肉味",
       "specification": "70g",
@@ -3863,7 +3878,8 @@
       "year": 2026,
       "series": "区域限定",
       "tags": [
-        "限定"
+        "限定",
+        "城市限定"
       ],
       "flavor": "见手青味",
       "specification": "70g",
