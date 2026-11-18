@@ -22,11 +22,11 @@
   function icon(name) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + (paths[name] || paths.bag) + '"></path></svg>'; }
   const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const image = value => C.validImage(value) ? value : 'assets/unknown.png';
-  const safeSource = value => { try { const u = new URL(value); return u.protocol === 'https:' && ['www.lays.com.cn','www.pepsico.com.cn','m.thepaper.cn','www.dealmoon.com','marketfoodasia.com','tao.hooos.com','www.foodaily.com','foodaily.com','post.smzdm.com','k.sina.cn','k.sina.com.cn','www.sohu.com','www.sayweee.com','wiki.smzdm.com','ma.gfsuper.com','www.digitaling.com','socialbeta.com','mightydepot.com','www.topfoo.com','www.ganhuoku.cn','www.foodtalks.cn','www.tentopsnacks.com','exoticers.com','americanuncleshop.fr','exosweet.com','www.foodinc.com.cn','www.smzdm.com','www.xinyingyang.com','candyfunhouse.com','shopee.ph','www.alibaba.com','www.umall.com.au','www.charmfoods.com.tw','www.yami.com','xinwen.bjd.com.cn','24h.pchome.com.tw','afamily.vn','shop.tiktok.com','laysaroundtheworld.com','shopee.tw','ufood.com.hk','beautycornerca.com','biggo.com.tw','online.citysuper.com.hk','style.udn.com','www.cosmopolitan.com','www.weee.com','www.wellcome.com.hk','fuji-san.ru','eg.alpremium.ca','exoticsnacks.com','online.carrefour.com.tw','tw.buy.yahoo.com','www.rakuten.com.tw','www.snaxo.ca','eorder.soda-mall.com','exoticsnackguysonline.com','munchaddict.com','shop.app','www.hktvmall.com','www.mintel.com','www.sina.cn','www.scrummy.pl','www.exodrinks.fr','www.waitrose.ae','sugarrushshop.co.uk','www.pns.hk','www.sinosplice.com','ep.shxwcb.com','www.noveltybee-store.com','onelife.tw','m.bjnews.com.cn'].includes(u.hostname) && !u.username && !u.password; } catch (_) { return false; } };
+  const safeSource = value => { try { const u = new URL(value); return u.protocol === 'https:' && ['www.lays.com.cn','www.pepsico.com.cn','m.thepaper.cn','www.dealmoon.com','marketfoodasia.com','tao.hooos.com','www.foodaily.com','foodaily.com','post.smzdm.com','k.sina.cn','k.sina.com.cn','www.sohu.com','www.sayweee.com','wiki.smzdm.com','ma.gfsuper.com','www.digitaling.com','socialbeta.com','mightydepot.com','www.topfoo.com','www.ganhuoku.cn','www.foodtalks.cn','www.tentopsnacks.com','exoticers.com','americanuncleshop.fr','exosweet.com','www.foodinc.com.cn','www.smzdm.com','www.xinyingyang.com','candyfunhouse.com','shopee.ph','www.alibaba.com','www.umall.com.au','www.charmfoods.com.tw','www.yami.com','xinwen.bjd.com.cn','24h.pchome.com.tw','afamily.vn','shop.tiktok.com','laysaroundtheworld.com','shopee.tw','ufood.com.hk','beautycornerca.com','biggo.com.tw','online.citysuper.com.hk','style.udn.com','www.cosmopolitan.com','www.weee.com','www.wellcome.com.hk','fuji-san.ru','eg.alpremium.ca','exoticsnacks.com','online.carrefour.com.tw','tw.buy.yahoo.com','www.rakuten.com.tw','www.snaxo.ca','eorder.soda-mall.com','exoticsnackguysonline.com','munchaddict.com','shop.app','www.hktvmall.com','www.mintel.com','www.sina.cn','www.scrummy.pl','www.exodrinks.fr','www.waitrose.ae','sugarrushshop.co.uk','www.pns.hk','www.sinosplice.com','ep.shxwcb.com','www.noveltybee-store.com','onelife.tw','m.bjnews.com.cn','pangjing.cn'].includes(u.hostname) && !u.username && !u.password; } catch (_) { return false; } };
   const date = value => { const d = new Date(value); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('zh-CN'); };
   const statusName = { pending:'待审核', approved:'已收录', rejected:'未通过' };
   let state, route = { name:'catalog' }, trail = [], sheet = null, draft = null, busy = false;
-  let filters = { search:'', tag:'', market:'', year:'', packagingForm:'', specification:'', series:'' }, favoriteTab = 'owned', adminTab = 'pending', historyTab = '';
+  let filters = { search:'', tag:'', market:'', year:'', packagingForm:'', specification:'', series:'', releaseBatch:'' }, favoriteTab = 'owned', adminTab = 'pending', historyTab = '';
   let side = 'coverImage', toastTimer;
   function toast(message) {
     root.querySelector('.toast')?.remove();
@@ -43,12 +43,18 @@
     const year = item.firstSeenYear || item.flavorDocumentedYear;
     return year ? '口味首见：' + year + '年' + (item.firstSeenProvisional ? '（待核）' : '') : '年份待核实';
   }
+  function cardTags(item) {
+    const batch = item.releaseBatch;
+    const genericTags = item.tags.filter(tag => !batch?.includes(tag) && !(tag === '联名' && batch?.includes('聯名')));
+    const badge = batch ? '<span class="edition edition-batch">' + esc(batch) + '</span>' : '';
+    return badge + genericTags.map(tag => '<span class="edition">' + esc(tag) + '</span>').join('');
+  }
   function card(item) {
     const status = C.favoriteStatus(state, item.id);
-    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(item.imageSpecification || item.specification || '规格待补') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + item.tags.map(t => '<span class="edition">' + esc(t) + '</span>').join('') + '</div></button>';
+    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(item.imageSpecification || item.specification || '规格待补') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + cardTags(item) + '</div></button>';
   }
   function catalogMarkup() {
-    const items = C.catalog(state, filters);
+    const items = C.homeCatalog(state, filters);
     const count = Object.entries(filters).filter(([key,value]) => key !== 'search' && value).length;
     return '<main class="page" data-screen-label="图鉴"><header class="topbar"><div class="brand"><div class="brand-icon">' + icon('bag') + '</div><div><h1>薯片袋图鉴</h1><p>乐事包装收藏册</p></div></div><span class="mode">' + modeText + '</span></header><div class="search-row"><label class="search">' + icon('search') + '<input id="catalog-search" type="search" maxlength="60" placeholder="搜索包装名称" aria-label="搜索包装名称" value="' + esc(filters.search) + '"></label>' + button(icon('filter') + '筛选' + (count ? '<span class="filter-count">' + count + '</span>' : ''), 'filters', 'filter-trigger' + (count ? ' selected' : ''), 'aria-label="筛选图鉴"') + '</div><div class="catalog-heading"><strong>' + (count || filters.search ? '筛选结果' : '全部图鉴') + ' <span class="muted">' + items.length + '</span></strong>' + (PUBLIC ? '' : button(icon('plus') + '补充图鉴', 'submit', 'text-btn')) + '</div>' + (items.length ? '<div class="grid">' + items.map(card).join('') + '</div>' : empty('没有找到这款包装', '换个名称或筛选条件试试。', button('清空筛选', 'clear-all', 'btn secondary'))) + '</main>' + navigation();
   }
@@ -63,7 +69,7 @@
   }
   function historyMarkupFor(chip) {
     const link = (url,text) => safeSource(url) ? ' <a target="_blank" rel="noopener noreferrer" href="' + esc(url) + '">' + text + ' ↗</a>' : '';
-    return (chip.timelineSource ? '<p class="description">时间线参考：' + esc(chip.timelineRecordId) + ' · ' + esc(chip.timelineSource) + '。' + esc(chip.timelineEvidence) + '。' + esc(chip.timelineNote) + '</p>' : '') + (chip.yearEvidence ? '<p class="description">' + esc(chip.yearEvidence) + link(chip.yearEvidenceUrl,'年份依据') + '</p>' : '') + (chip.historyNote ? '<p class="description">' + esc(chip.historyNote) + link(chip.historyUrl,'历史资料') + '</p>' : '');
+    return (chip.releaseBatch ? '<p class="source-note">' + esc(chip.releaseBatch) + link(chip.releaseBatchSourceUrl,'批次来源') + '</p>' : '') + (chip.timelineSource ? '<p class="description">时间线参考：' + esc(chip.timelineRecordId) + ' · ' + esc(chip.timelineSource) + '。' + esc(chip.timelineEvidence) + '。' + esc(chip.timelineNote) + '</p>' : '') + (chip.yearEvidence ? '<p class="description">' + esc(chip.yearEvidence) + link(chip.yearEvidenceUrl,'年份依据') + '</p>' : '') + (chip.historyNote ? '<p class="description">' + esc(chip.historyNote) + link(chip.historyUrl,'历史资料') + '</p>' : '');
   }
   function detailMarkup() {
     const chip = state.chips.find(c => c.id === route.id);
@@ -131,7 +137,8 @@
       const series = [...new Set(['原切','无限','大波浪','自然滋味',...state.chips.map(c => c.series).filter(Boolean)])];
       const weights = [...new Set([...C.FOCUS_WEIGHTS,...state.chips.map(c => c.specification).filter(Boolean)])].sort((a,b) => parseFloat(a)-parseFloat(b));
       const years = [...new Set(state.chips.map(c => c.year).filter(Boolean))].sort((a,b) => a-b);
-      content = '<form id="filters-form">' + select('market','地区',C.MARKETS,'全部地区') + select('year','包装年份',[...years,['unknown','待核实']],'全部年份') + select('series','产品系列',series,'全部系列') + select('packagingForm','包装形态',C.FORMS,'袋装、罐装') + select('specification','净含量',weights,'全部规格') + select('tag','款式',['常规',...C.TAGS],'全部款式') + '<div class="action-row">' + button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></form>';
+      const batches = [...new Set(C.homeCatalog(state).map(c => c.releaseBatch).filter(Boolean))];
+      content = '<form id="filters-form">' + select('market','地区',C.MARKETS,'全部地区') + select('year','包装年份',[...years,['unknown','待核实']],'全部年份') + select('series','产品系列',series,'全部系列') + select('packagingForm','包装形态',C.FORMS,'袋装、罐装') + select('specification','净含量',weights,'全部规格') + select('tag','款式',['常规',...C.TAGS],'全部款式') + select('releaseBatch','发行批次',batches,'全部批次') + '<div class="action-row">' + button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></form>';
     }
     if (sheet.type === 'about') content = '<p>图鉴当前收录 ' + C.initialState().chips.length + ' 条产品记录，包含不同市场、系列及包装形态。筛选支持年份、系列、袋装／罐装与净含量。详情保留素材来源。</p><p>收藏中预放了一组展示记录，可自行调整。图片和操作保存在当前浏览器。</p>' + button('知道了','close-sheet','btn full');
     if (sheet.type === 'visibility') content = '<p>收藏仅保存在当前浏览器，当前为私有收藏。</p>' + button('知道了','close-sheet','btn full');
@@ -179,8 +186,8 @@
     if (a === 'side') { side = el.dataset.side; return render(true); }
     if (a === 'zoom') { sheet = {type:'zoom'}; return render(true); }
     if (a === 'filters') { sheet = {type:'filters'}; return render(true); }
-    if (a === 'clear-all') { filters = {search:'',tag:'',market:'',year:'',packagingForm:'',specification:'',series:''}; return render(); }
-    if (a === 'reset-filters') { filters = {search:filters.search,tag:'',market:'',year:'',packagingForm:'',specification:'',series:''}; return render(true); }
+    if (a === 'clear-all') { filters = {search:'',tag:'',market:'',year:'',packagingForm:'',specification:'',series:'',releaseBatch:''}; return render(); }
+    if (a === 'reset-filters') { filters = {search:filters.search,tag:'',market:'',year:'',packagingForm:'',specification:'',series:'',releaseBatch:''}; return render(true); }
     if (a === 'favorite-tab') { favoriteTab = el.dataset.tab; return render(); }
     if (a === 'favorite') return write(s => C.setFavorite(s,route.id,C.favoriteStatus(s,route.id) === el.dataset.status ? '' : el.dataset.status),'收藏已更新');
     if (a === 'contribute') { if (PUBLIC) return; return go('submit',{targetChipId:id}); }
@@ -209,7 +216,7 @@
   });
   root.addEventListener('submit', async event => {
     event.preventDefault(); if (busy) return;
-    if (event.target.id === 'filters-form') { const data = new FormData(event.target); for (const key of ['market','year','series','packagingForm','specification','tag']) filters[key] = data.get(key); sheet = null; return render(); }
+    if (event.target.id === 'filters-form') { const data = new FormData(event.target); for (const key of ['market','year','series','packagingForm','specification','tag','releaseBatch']) filters[key] = data.get(key); sheet = null; return render(); }
     if (event.target.id !== 'editor-form') return;
     updateDraft(); const errorElement = document.getElementById('form-error'); errorElement.textContent = '';
     try {
