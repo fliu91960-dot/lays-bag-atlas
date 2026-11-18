@@ -1,5 +1,5 @@
 {
-  "revision": 38,
+  "revision": 39,
   "updatedAt": "2026-11-18",
   "products": [
     {
@@ -3670,10 +3670,10 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "与2025年春收系列分年度记录。",
-      "coverImage": "assets/pack-l0137.jpg",
+      "coverImage": "assets/spring-original-70g.jpg",
       "backImage": "",
       "imagePending": false,
-      "sourceKind": "media",
+      "sourceKind": "retail",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2026,
@@ -3693,9 +3693,9 @@
       "releaseBatchSourceUrl": "https://xinwen.bjd.com.cn/content/s69c64bdae4b0cd719e9f9e17.html",
       "releaseBatchOrder": 3,
       "releaseBatchPosition": 0,
-      "sourceLabel": "北京日報品牌宣傳圖包装局部",
-      "sourceUrl": "https://xinwen.bjd.com.cn/content/s69c64bdae4b0cd719e9f9e17.html",
-      "sourceImageUrl": "https://static.bjd.com.cn/dams-res/editing/image/202603/25/7pxdcofddtvpscsucec7seyc_m.jpg",
+      "sourceLabel": "Beauty Corner 商品实拍 · 白底单袋正面",
+      "sourceUrl": "https://beautycornerca.com/products/自营-中国百事lays乐事-春收马铃薯薯片-自然本味-70g-休闲零食膨化食品",
+      "sourceImageUrl": "https://beautycornerca.com/cdn/shop/files/unnamed_ea8290af-78a9-4c37-aeb9-6bab36c05750_900x.jpg?v=1777905761",
       "sourceCheckedAt": "2026-11-18",
       "imageSpecification": "70g",
       "yearEvidenceUrl": "https://xinwen.bjd.com.cn/content/s69c64bdae4b0cd719e9f9e17.html",
