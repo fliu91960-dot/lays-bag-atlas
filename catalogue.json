@@ -1,5 +1,5 @@
 {
-  "revision": 33,
+  "revision": 34,
   "updatedAt": "2026-11-18",
   "products": [
     {
@@ -265,7 +265,7 @@
     },
     {
       "id": "official-cn-10",
-      "name": "清新芥香味",
+      "name": "清新芥香味（经典版）",
       "market": "中国大陆",
       "year": null,
       "tags": [],
@@ -273,7 +273,7 @@
       "flavor": "清新芥香味",
       "specification": "70g",
       "packagingForm": "袋装",
-      "description": "名称和净含量按包装正面核对。",
+      "description": "清新芥香味经典绿袋，原切 70g。",
       "coverImage": "assets/white-official-cn-10.webp",
       "backImage": "",
       "sourceKind": "official",
@@ -290,19 +290,22 @@
       "firstSeenProvisional": false,
       "timelineEvidence": "原始Excel记录；未逐条核验",
       "timelineNote": "部分渠道写作「清新芥香」",
-      "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx"
+      "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx",
+      "imageSpecification": "70g"
     },
     {
       "id": "wasabi-jm",
-      "name": "清新芥香味·芥么离谱版",
+      "name": "清新芥香味（芥么离谱·夏季限定）",
       "flavor": "清新芥香味",
-      "series": "经典袋装",
+      "series": "季节限定",
       "market": "中国大陆",
       "packagingForm": "袋装",
       "specification": "70g",
-      "year": null,
-      "tags": [],
-      "description": "",
+      "year": 2025,
+      "tags": [
+        "限定"
+      ],
+      "description": "2025 年夏季限定 70g。袋顶写着「芥么离谱」，正面为拟人芥末图案。",
       "backImage": "",
       "coverImage": "assets/white-wasabi-jm-r30.webp",
       "imagePending": false,
@@ -315,7 +318,11 @@
       "active": true,
       "isDemo": false,
       "createTime": "2026-11-18T00:00:00.000Z",
-      "updateTime": "2026-11-18T00:00:00.000Z"
+      "updateTime": "2026-11-18T00:00:00.000Z",
+      "firstSeenYear": 2025,
+      "firstSeenProvisional": false,
+      "yearEvidenceUrl": "https://m.bjnews.com.cn/detail/1751958946129887.html",
+      "yearEvidence": "2025 年 7 月的新品报道同时展示夏季限定清新芥香味及「芥么离谱」包装。"
     },
     {
       "id": "official-cn-11",
@@ -3025,40 +3032,6 @@
       "sourceImageUrl": "https://www.umall.com.au/cdn/shop/files/1_babaa087-c565-454c-b411-210cf90bdd05.jpg?v=1754643229",
       "sourceCheckedAt": "2026-11-18",
       "imageSpecification": "70g"
-    },
-    {
-      "id": "timeline-l0089",
-      "name": "清新芥香味（夏季限定）",
-      "market": "中国大陆",
-      "year": null,
-      "series": "季节限定",
-      "tags": [
-        "限定"
-      ],
-      "flavor": "清新芥香味",
-      "specification": "",
-      "packagingForm": "袋装",
-      "description": "夏季限定包装，完整正面图待补。",
-      "coverImage": "assets/unknown.png",
-      "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
-      "active": true,
-      "isDemo": false,
-      "firstSeenYear": 2025,
-      "firstSeenProvisional": true,
-      "timelineRecordId": "L0089",
-      "timelineSource": "乐事产品图鉴_时间线整合版_20261117.xlsx",
-      "timelineEvidence": "《新闻晨报》2026 年 2 月 3 日报道回顾 2025 年夏季限定清新芥香口味。",
-      "timelineNote": "原表「清新茉香」为误读。该卡记录夏季限定的另一个包装，袋图待核实。",
-      "productType": "薯片",
-      "regionalChannel": "全国/未注明",
-      "productStatus": "历史限定/复刻状态待核实",
-      "packagingVersion": null,
-      "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z",
-      "historyUrl": "https://ep.shxwcb.com/2026/02/03/img/230203.pdf",
-      "historyNote": "报纸原文写作「清新芥香口味」。"
     },
     {
       "id": "timeline-l0090",
