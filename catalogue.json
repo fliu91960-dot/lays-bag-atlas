@@ -1,5 +1,5 @@
 {
-  "revision": 16,
+  "revision": 17,
   "updatedAt": "2026-11-18",
   "products": [
     {
@@ -2246,7 +2246,7 @@
       "id": "timeline-l0110",
       "name": "棒骨炖酸菜味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2024,
       "series": "区域限定",
       "tags": [
         "限定"
@@ -2255,10 +2255,10 @@
       "specification": "70g / 65g",
       "packagingForm": "袋装",
       "description": "价格版克重由 70g 降至 65g",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/pack-l0110.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2024,
@@ -2272,13 +2272,20 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": "2 版；2024；一版标「限定口味」，一版改为「建议零售价 5.8 元」并降至 65g",
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃新闻宣传图包装局部",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "sourceImageUrl": "https://imagepphcloud.thepaper.cn/pph/image/303/977/490.png",
+      "sourceCheckedAt": "2026-11-18",
+      "imageSpecification": "待核实",
+      "yearEvidenceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "yearEvidence": "2024年上市报道展示对应口味与包装。"
     },
     {
       "id": "timeline-l0108",
       "name": "煎饼卷大葱味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2024,
       "series": "区域限定",
       "tags": [
         "限定"
@@ -2287,10 +2294,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/pack-l0108.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2024,
@@ -2304,13 +2311,20 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃新闻宣传图包装局部",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "sourceImageUrl": "https://imagepphcloud.thepaper.cn/pph/image/303/977/490.png",
+      "sourceCheckedAt": "2026-11-18",
+      "imageSpecification": "70g",
+      "yearEvidenceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "yearEvidence": "2024年上市报道展示对应口味与包装。"
     },
     {
       "id": "timeline-l0109",
       "name": "牛肉板面味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2024,
       "series": "区域限定",
       "tags": [
         "限定"
@@ -2319,10 +2333,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "与北国超市等本地系统合作铺货",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/pack-l0109.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2024,
@@ -2336,13 +2350,20 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃新闻宣传图包装局部",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "sourceImageUrl": "https://imagepphcloud.thepaper.cn/pph/image/303/977/490.png",
+      "sourceCheckedAt": "2026-11-18",
+      "imageSpecification": "待核实",
+      "yearEvidenceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "yearEvidence": "2024年上市报道展示对应口味与包装。"
     },
     {
       "id": "timeline-l0107",
       "name": "螺蛳粉味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2024,
       "series": "区域限定",
       "tags": [
         "限定",
@@ -2352,10 +2373,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "与好欢螺联名，争议度最高的一款；同时作为广西区域限定",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/pack-l0107.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2024,
@@ -2369,13 +2390,20 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃新闻宣传图包装局部",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "sourceImageUrl": "https://imagepphcloud.thepaper.cn/pph/image/303/977/490.png",
+      "sourceCheckedAt": "2026-11-18",
+      "imageSpecification": "待核实",
+      "yearEvidenceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "yearEvidence": "2024年上市报道展示对应口味与包装。"
     },
     {
       "id": "timeline-l0106",
       "name": "遵义羊肉粉味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2024,
       "series": "区域限定",
       "tags": [
         "限定"
@@ -2384,10 +2412,10 @@
       "specification": "70g",
       "packagingForm": "袋装",
       "description": "2024 年五款全新口味之一，该系列获 iSEE 全球食品创新奖金奖",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/pack-l0106.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2024,
@@ -2401,7 +2429,14 @@
       "productStatus": "历史限定/当前状态待核实",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "澎湃新闻宣传图包装局部",
+      "sourceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "sourceImageUrl": "https://imagepphcloud.thepaper.cn/pph/image/303/977/490.png",
+      "sourceCheckedAt": "2026-11-18",
+      "imageSpecification": "70g",
+      "yearEvidenceUrl": "https://m.thepaper.cn/newsDetail_forward_27296568",
+      "yearEvidence": "2024年上市报道展示对应口味与包装。"
     },
     {
       "id": "timeline-l0126",
@@ -2520,7 +2555,7 @@
       "id": "timeline-l0132",
       "name": "芭拿拿香蕉味",
       "market": "中国大陆",
-      "year": null,
+      "year": 2025,
       "series": "乐事无限×小黄人",
       "tags": [
         "联名"
@@ -2529,10 +2564,10 @@
       "specification": "90g×3+104g×3（礼盒组合规格）",
       "packagingForm": "罐装",
       "description": "小黄人联名礼盒；礼盒另含醇香原味、沁爽青柠、翡翠黄瓜等经典口味。",
-      "coverImage": "assets/unknown.png",
+      "coverImage": "assets/pack-l0132.jpg",
       "backImage": "",
-      "imagePending": true,
-      "sourceKind": "reference",
+      "imagePending": false,
+      "sourceKind": "media",
       "active": true,
       "isDemo": false,
       "firstSeenYear": 2025,
@@ -2546,7 +2581,14 @@
       "productStatus": "历史联名/当前状态未知",
       "packagingVersion": null,
       "createTime": "2026-11-17T00:00:00.000Z",
-      "updateTime": "2026-11-17T00:00:00.000Z"
+      "updateTime": "2026-11-17T00:00:00.000Z",
+      "sourceLabel": "Candy Funhouse渠道商品图包装局部",
+      "sourceUrl": "https://candyfunhouse.com/products/lays-minions-banana-flavored-chips-china-90g",
+      "sourceImageUrl": "https://candyfunhouse.com/cdn/shop/files/lays-minions-banana-flavored-chips-china-90g-Candy-Funhouse-US.png?v=1763482577&width=800",
+      "sourceCheckedAt": "2026-11-18",
+      "imageSpecification": "90g",
+      "yearEvidenceUrl": "https://www.foodaily.com/new_products/3226",
+      "yearEvidence": "2025年上市报道展示对应口味与包装。"
     },
     {
       "id": "timeline-l0136",
