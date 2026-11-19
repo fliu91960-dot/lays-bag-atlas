@@ -273,7 +273,8 @@
     return [...byYear].sort(([a],[b])=>a === null ? 1 : b === null ? -1 : order === 'year-asc' ? a-b : b-a);
   }
   function releaseBatches(state, query) {
-    const matches = searchFilter(query);
+    const terms = normalizeSearch(query).replace(/(^|\s)(\d{4})(?:\s*年)?(?=\s|$|[^\d.])/g,'$1$2 ');
+    const matches = searchFilter(terms);
     const batches = new Map();
     for (const card of homeCatalog(state)) {
       const id = card.releaseBatchId;
