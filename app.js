@@ -298,6 +298,7 @@
     return {name:'detail',id:C.resolvePublicChip(state,id)?.id || id,fromLink:true};
   }
   function go(name, args) {
+    if (route.name === name && !args) return;
     if (PUBLIC) history.replaceState(navigationState(),'');
     if (['catalog','favorites','profile'].includes(name)) trail = [];
     else trail.push({route, scrollTop: pageScroll()});
@@ -319,6 +320,22 @@
     sheet = null; side = 'coverImage';
     render(saved.scrollTop);
   }
+  function rememberNavigation() {
+    if (!PUBLIC || !state) return;
+    try {
+      sessionStorage.setItem('atlas-reload',JSON.stringify({url:location.href,saved:navigationState()}));
+    } catch (_) { /* Browsing still works when tab storage is unavailable. */ }
+  }
+  function navigationOnLoad() {
+    if (performance.getEntriesByType('navigation')[0]?.type === 'reload') {
+      try {
+        const snapshot = JSON.parse(sessionStorage.getItem('atlas-reload'));
+        if (snapshot?.url === location.href) return snapshot.saved;
+      } catch (_) { /* Fall back to the browser history entry. */ }
+    }
+    return history.state;
+  }
+  window.addEventListener('pagehide', rememberNavigation);
   if (PUBLIC) window.addEventListener('popstate', event => {
     if (!state) return;
     if (event.state?.atlas) return restoreNavigation(event.state);
@@ -600,12 +617,15 @@
     finally { reading = false; if (readQueued) refreshExternal(); }
   }
   R.onExternalChange(queueExternalRead);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) queueExternalRead(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) rememberNavigation();
+    else queueExternalRead();
+  });
   R.initialize().then(data => {
     state = data;
     const linked = PUBLIC ? routeFromLink() : route;
-    const saved = history.state;
-    if (linked.id && saved?.atlas && saved.route.name === linked.name && saved.route.id === linked.id) restoreNavigation(saved);
+    const saved = PUBLIC && navigationOnLoad();
+    if (PUBLIC && saved?.atlas && routeUrl(saved.route) === location.href) restoreNavigation(saved);
     else { route = linked; render(); }
     refreshExternal();
   }).catch(error => {
