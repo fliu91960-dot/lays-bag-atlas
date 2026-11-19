@@ -31,9 +31,10 @@
   let state, route = { name:'catalog' }, trail = [], sheet = null, draft = null, busy = false;
   const collectionOptions = [['missing','未拥有'],['owned','已拥有'],['wanted','想要收藏']];
   const imageOptions = [['ready','已有封面'],['pending','封面待补']];
-  const filterKeys = ['market','year','series','packagingForm','specification','tag','releaseBatch','collection','imageStatus'];
+  const orderOptions = [['year-desc','包装年份从新到旧'],['year-asc','包装年份从旧到新']];
+  const filterKeys = ['market','year','series','packagingForm','specification','tag','releaseBatch','collection','imageStatus','order'];
   const defaultFilters = () => ({search:'', ...Object.fromEntries(filterKeys.map(key=>[key,'']))});
-  let filters = defaultFilters(), favoriteTab = 'owned', adminTab = 'pending', historyTab = '';
+  let filters = defaultFilters(), favoriteTab = 'owned', favoriteSearch = '', adminTab = 'pending', historyTab = '';
   let side = 'coverImage', toastTimer;
   function toast(message) {
     root.querySelector('.toast')?.remove();
@@ -65,8 +66,14 @@
   }
   function filterLabel(key, value) {
     if (key === 'year' && value === 'unknown') return '包装年份待核实';
-    const options = {collection:collectionOptions,imageStatus:imageOptions}[key];
+    const options = {collection:collectionOptions,imageStatus:imageOptions,order:orderOptions}[key];
     return options?.find(([id])=>id === value)?.[1] || value;
+  }
+  function cardGrid(items) { return '<div class="grid">' + items.map(card).join('') + '</div>'; }
+  function yearGroups(items, order, markup, unit = '款') {
+    return C.packagingYearGroups(items,order).map(([year,group]) =>
+      '<section class="year-group" data-year="' + (year || 'unknown') + '"><h2><span>' +
+      (year ? year + ' 年' : '包装年份待核实') + '</span><small>' + group.length + ' ' + unit + '</small></h2>' + markup(group) + '</section>').join('');
   }
   function catalogResults() {
     const items = C.homeCatalog(state, filters);
@@ -75,17 +82,35 @@
       const value = filterLabel(key,filters[key]);
       return button(esc(value) + ' ×', 'remove-filter', '', 'data-key="' + key + '" aria-label="移除筛选 ' + esc(value) + '"');
     }).join('');
-    const heading = '<div class="catalog-heading"><strong>' + (selected.length || filters.search ? '筛选结果' : '全部图鉴') + ' <span class="muted">' + items.length + '</span></strong>' + (PUBLIC ? '' : button(icon('plus') + '补充图鉴', 'submit', 'text-btn')) + '</div>';
-    return (summary ? '<div class="filter-summary">' + summary + '</div>' : '') + heading + (items.length ? '<div class="grid">' + items.map(card).join('') + '</div>' : empty('没有找到这款包装', '试试其他口味，或清除筛选条件。', button('查看全部图鉴', 'clear-all', 'btn secondary')));
+    const actions = button('发行批次 ' + icon('arrow'),'batch-directory','text-btn') + (!PUBLIC ? button(icon('plus') + '补充图鉴','submit','text-btn') : '');
+    const heading = '<div class="catalog-heading"><strong>' + (selected.some(key=>key !== 'order') || filters.search ? '筛选结果' : '全部图鉴') + ' <span class="muted">' + items.length + '</span></strong><div class="catalog-tools">' + actions + '</div></div>';
+    const results = items.length ? (filters.order ? yearGroups(items,filters.order,cardGrid) : cardGrid(items)) :
+      empty('没有找到这款包装','试试其他口味，或清除筛选条件。',button('查看全部图鉴','clear-all','btn secondary'));
+    return (summary ? '<div class="filter-summary">' + summary + '</div>' : '') + heading + results;
   }
   function catalogMarkup() {
     const count = filterKeys.filter(key => filters[key]).length;
     const filter = button(icon('filter') + '筛选' + (count ? '<span class="filter-count">' + count + '</span>' : ''), 'filters', 'filter-trigger' + (count ? ' selected' : ''), 'aria-label="筛选图鉴"');
     return '<main class="page" data-screen-label="图鉴"><header class="topbar"><div class="brand"><div class="brand-icon">' + icon('bag') + '</div><h1>乐事薯片袋图鉴</h1></div></header><div class="search-row"><label class="search">' + icon('search') + '<input id="catalog-search" type="search" maxlength="60" placeholder="搜索名称、口味或系列" aria-label="搜索包装名称、口味或系列" value="' + esc(filters.search) + '"></label>' + filter + '</div><div id="catalog-results">' + catalogResults() + '</div></main>' + navigation();
   }
+  function searchBox(id,label,placeholder,value) {
+    return '<div class="search-row"><label class="search">' + icon('search') + '<input id="' + id + '" type="search" maxlength="60" aria-label="' + label + '" placeholder="' +
+      placeholder + '" value="' + esc(value || '') + '"></label></div>';
+  }
+  function favoriteResults() {
+    const items = C.favorites(state,favoriteTab,{query:favoriteSearch,recent:true});
+    if (!items.length && favoriteSearch.trim()) return empty('这页收藏没有匹配的包装','',button('清除收藏搜索','clear-favorite-search','btn secondary'));
+    return items.length ? cardGrid(items) : empty(favoriteTab === 'owned' ? '还没有已拥有的包装' : '还没有想要收藏的包装','',
+      button('浏览图鉴','nav','btn','data-name="catalog"'));
+  }
   function favoritesMarkup() {
-    const items = C.favorites(state, favoriteTab), owned = C.favorites(state, 'owned').length, wanted = C.favorites(state, 'wanted').length;
-    return '<main class="page" data-screen-label="我的收藏"><header class="topbar"><h1>我的收藏</h1><span class="mode">' + esc(C.user(state).name) + '</span></header><div class="tabs-wide">' + [['owned','已拥有',owned],['wanted','想要收藏',wanted]].map(([id,name,count]) => button(name + ' <span class="muted">' + count + '</span>', 'favorite-tab', favoriteTab === id ? 'active' : '', 'data-tab="' + id + '"')).join('') + '</div>' + (items.length ? '<div class="grid">' + items.map(card).join('') + '</div>' : empty(favoriteTab === 'owned' ? '第一只袋子，等你点亮' : '把想要的包装记在这里', '去图鉴看看，找到喜欢的那一款。', button('逛逛图鉴', 'nav', 'btn', 'data-name="catalog"'))) + '</main>' + navigation();
+    const owned = C.favorites(state,'owned').length, wanted = C.favorites(state,'wanted').length;
+    const tabs = [['owned','已拥有',owned],['wanted','想要收藏',wanted]].map(([id,name,count]) =>
+      button(name + ' <span class="muted" data-favorite-count="' + id + '">' + count + '</span>','favorite-tab',favoriteTab === id ? 'active' : '',
+        'data-tab="' + id + '" aria-pressed="' + (favoriteTab === id) + '"')).join('');
+    return '<main class="page" data-screen-label="我的收藏"><header class="topbar"><h1>我的收藏</h1></header><div class="tabs-wide">' + tabs + '</div>' +
+      searchBox('favorite-search','搜索我的收藏','搜收藏中的名称、口味或克重',favoriteSearch) +
+      '<div id="favorite-results" class="section-results">' + favoriteResults() + '</div></main>' + navigation();
   }
   function profileMarkup() {
     const user = C.user(state), submissions = C.ownSubmissions(state);
@@ -141,14 +166,36 @@
       action,'package-option' + (selected ? ' selected' : ''),'data-id="' + esc(chip.id) + '"' + (action === 'choose-duplicate' ? ' aria-pressed="' + selected + '"' : ''));
   }
   function batchMarkup() {
-    const cards = C.homeCatalog(state,{releaseBatch:route.batch});
+    const batch = C.releaseBatches(state).find(group=>group.id === route.id);
+    if (!batch) return '<main class="page">' + header('发行批次') +
+      empty('找不到此批次','',button('返回图鉴','back','btn')) + '</main>';
+    const cards = batch.cards;
     const owned = new Set(C.favorites(state,'owned').map(chip=>chip.id));
     const count = cards.filter(chip=>owned.has(chip.id)).length;
     const visible = route.onlyMissing ? cards.filter(chip=>!owned.has(chip.id)) : cards;
     const progress = cards.length ? '<p class="batch-progress">已拥有 <strong>' + count + '/' + cards.length + '</strong> 款 · 本图鉴收录 ' + cards.length + ' 款</p>' : '';
-    return '<main class="page" data-screen-label="发行批次">' + header(route.batch) + '<div class="batch-controls">' + progress +
+    const share = PUBLIC && location.protocol !== 'file:' ? button('复制批次链接','share-batch','btn secondary') : '';
+    const source = safeSource(batch.sourceUrl) ? '<p class="batch-source source-note"><a href="' + esc(batch.sourceUrl) + '" target="_blank" rel="noopener noreferrer">批次资料 ↗</a></p>' : '';
+    return '<main class="page" data-screen-label="发行批次">' + header(batch.name,share) + '<div class="batch-controls">' + progress +
       button('只看未拥有','batch-missing','btn secondary','aria-pressed="' + !!route.onlyMissing + '"') + '</div>' +
-      (visible.length ? '<div class="grid">' + visible.map(card).join('') + '</div>' : empty(cards.length ? '已拥有本图鉴收录的全部款' : '此批次暂无在架包装','')) + '</main>';
+      (visible.length ? cardGrid(visible) : empty('已拥有本图鉴收录的全部款','')) + source + '</main>';
+  }
+  function batchDirectoryResults() {
+    const batches = C.releaseBatches(state,route.query);
+    if (!batches.length) return empty('没有匹配的发行批次','',button('清除批次搜索','clear-batch-search','btn secondary'));
+    const owned = new Set(C.favorites(state,'owned').map(chip=>chip.id));
+    return yearGroups(batches,'year-desc',group=>'<div class="batch-index">' + group.map(batch=>{
+      const cover = batch.cards.find(C.hasFrontImage);
+      const progress = batch.cards.filter(chip=>owned.has(chip.id)).length + '/' + batch.cards.length + ' 款';
+      const art = cover ? '<img src="' + esc(image(cover.coverImage)) + '" alt="" loading="lazy">' : '<span class="batch-cover-empty">' + icon('bag') + '</span>';
+      return button(art + '<span><strong>' + esc(batch.name) + '</strong><small>已拥有 ' + progress + '</small></span>' + icon('arrow'),
+        'open-batch','package-option batch-index-item','data-id="' + esc(batch.id) + '"');
+    }).join('') + '</div>','批');
+  }
+  function batchDirectoryMarkup() {
+    return '<main class="page" data-screen-label="批次索引">' + header('发行批次') +
+      searchBox('batch-search','搜索发行批次','搜批次名称、口味或年份',route.query) +
+      '<div id="batch-directory-results" class="section-results">' + batchDirectoryResults() + '</div></main>';
   }
   function option(value, label, selected) { return '<option value="' + esc(value) + '"' + (String(selected) === String(value) ? ' selected' : '') + '>' + esc(label) + '</option>'; }
   function originalPictures(record) {
@@ -235,23 +282,20 @@
   }
   function pageScroll() { return root.querySelector('.page')?.scrollTop || 0; }
   function navigationState() {
-    return {atlas:true,route,trail,filters,favoriteTab,scrollTop:pageScroll()};
+    return {atlas:true,route,trail,filters,favoriteTab,favoriteSearch,scrollTop:pageScroll()};
   }
-  function chipUrl(id) {
+  function routeUrl(current = route, sharing = false) {
     const url = new URL(location.href);
-    url.search = '';
-    url.hash = '/chip/' + encodeURIComponent(id);
+    if (sharing) url.search = '';
+    const kind = {detail:'chip',batch:'batch'}[current.name];
+    url.hash = kind ? '/' + kind + '/' + encodeURIComponent(current.id) : '';
     return url.href;
   }
   function routeFromLink() {
+    if (/^#\/batch(?:\/|$)/.test(location.hash)) return {name:'batch',id:location.hash.slice('#/batch/'.length)};
     if (!/^#\/chip(?:\/|$)/.test(location.hash)) return {name:'catalog'};
     const id = location.hash.slice('#/chip/'.length);
     return {name:'detail',id:C.resolvePublicChip(state,id)?.id || id,fromLink:true};
-  }
-  function routeUrl() {
-    const url = new URL(location.href);
-    url.hash = route.name === 'detail' ? '/chip/' + encodeURIComponent(route.id) : '';
-    return url.href;
   }
   function go(name, args) {
     if (PUBLIC) history.replaceState(navigationState(),'');
@@ -271,7 +315,7 @@
     if (PUBLIC) history.replaceState(navigationState(),'',routeUrl());
   }
   function restoreNavigation(saved) {
-    ({route,trail,filters,favoriteTab} = saved);
+    ({route,trail,filters,favoriteTab,favoriteSearch = ''} = saved);
     sheet = null; side = 'coverImage';
     render(saved.scrollTop);
   }
@@ -287,9 +331,9 @@
       const chip = state.chips.find(c => c.id === route.id);
       return '<div class="viewer" role="dialog" aria-modal="true" aria-label="包装大图">' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭大图"') + '<img src="' + esc(image(chip?.[side] || chip?.coverImage)) + '" alt="包装大图"><p>' + esc(chip?.name || '') + '</p></div>';
     }
-    const title = {filters:'筛选图鉴',about:'关于图鉴',discard:'放弃这次修改？',active:'下架这款图鉴？',submission:'投稿详情',share:'单品链接'}[sheet.type] || '';
+    const title = {filters:'筛选图鉴',about:'关于图鉴',discard:'放弃这次修改？',active:'下架这款图鉴？',submission:'投稿详情',share:route.name === 'batch' ? '批次链接' : '单品链接'}[sheet.type] || '';
     let content = '';
-    if (sheet.type === 'share') content = '<label class="field"><span>选择并复制地址</span><input id="share-url" readonly value="' + esc(chipUrl(route.id)) + '"></label>';
+    if (sheet.type === 'share') content = '<label class="field"><span>选择并复制地址</span><input id="share-url" readonly value="' + esc(routeUrl(route,true)) + '"></label>';
     if (sheet.type === 'filters') {
       const select = (key,label,values,all) => '<label class="field' + (key === 'releaseBatch' ? ' filter-wide' : '') + '"><span>' + label + '</span><select name="' + key + '">' + option('',all,filters[key] || '') + values.map(v => option(Array.isArray(v) ? v[0] : v,Array.isArray(v) ? v[1] : v,filters[key])).join('') + '</select></label>';
       const active = C.homeCatalog(state);
@@ -306,6 +350,7 @@
         select('tag','款式',['常规',...C.TAGS],'全部款式') +
         select('collection','收藏状态',collectionOptions,'全部状态') +
         select('imageStatus','展示图片',imageOptions,'全部图片') +
+        select('order','浏览顺序',orderOptions,'默认顺序') +
         select('releaseBatch','发行批次',batches,'全部批次') +
         '<div class="filter-actions"><output id="filter-preview" aria-live="polite">' + matchingCount(filters) + '</output><div class="action-row">' +
         button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></div></form>';
@@ -330,7 +375,7 @@
     form.querySelector('#filter-preview').textContent = matchingCount(filterDraft(form));
   }
   function render(scrollTop = 0) {
-    const functions = {catalog:catalogMarkup,favorites:favoritesMarkup,profile:profileMarkup,detail:detailMarkup,batch:batchMarkup,submit:editorMarkup,edit:editorMarkup,review:editorMarkup,history:historyMarkup,admin:adminMarkup};
+    const functions = {catalog:catalogMarkup,favorites:favoritesMarkup,profile:profileMarkup,detail:detailMarkup,batch:batchMarkup,directory:batchDirectoryMarkup,submit:editorMarkup,edit:editorMarkup,review:editorMarkup,history:historyMarkup,admin:adminMarkup};
     root.innerHTML = (functions[route.name] || catalogMarkup)() + sheetMarkup();
     const page = root.querySelector('.page'); if (page) { page.scrollTop = scrollTop; if (sheet) page.setAttribute('inert',''); }
     if (sheet) { root.querySelector('.bottom-nav')?.setAttribute('inert',''); root.querySelector('.sticky-actions')?.setAttribute('inert',''); root.querySelector('.sheet-close')?.focus({preventScroll:true}); }
@@ -368,15 +413,23 @@
     if (a === 'back') return back();
     if (a === 'discard') return back(true);
     if (a === 'detail') return go('detail',{id});
+    if (a === 'batch-directory') return go('directory',{query:''});
     if (a === 'open-batch') {
-      const batch = state.chips.find(c=>c.id === route.id)?.releaseBatch;
-      if (batch) go('batch',{batch,onlyMissing:false});
+      const batchId = id || state.chips.find(c=>c.id === route.id)?.releaseBatchId;
+      if (batchId) go('batch',{id:batchId,onlyMissing:false});
       return;
     }
     if (a === 'batch-missing') { route.onlyMissing = !route.onlyMissing; return render(); }
-    if (a === 'share-chip') {
+    if (a === 'clear-batch-search' || a === 'clear-favorite-search') {
+      const input = document.getElementById(a === 'clear-batch-search' ? 'batch-search' : 'favorite-search');
+      input.value = '';
+      refreshSearch(input);
+      input.focus();
+      return;
+    }
+    if (a === 'share-chip' || a === 'share-batch') {
       const current = route;
-      try { await navigator.clipboard.writeText(chipUrl(current.id)); toast('已复制单品链接'); }
+      try { await navigator.clipboard.writeText(routeUrl(current,true)); toast(current.name === 'batch' ? '已复制批次链接' : '已复制单品链接'); }
       catch (_) {
         if (route !== current) return;
         sheet = {type:'share'}; render(pageScroll());
@@ -469,10 +522,16 @@
       }
     } catch (error) { errorElement.textContent = error.message; errorElement.scrollIntoView({block:'nearest'}); }
   });
+  const searchViews = {
+    'catalog-search': {selector:'#catalog-results',markup:catalogResults,save:value=>{filters.search=value;}},
+    'favorite-search': {selector:'#favorite-results',markup:favoriteResults,save:value=>{favoriteSearch=value;}},
+    'batch-search': {selector:'#batch-directory-results',markup:batchDirectoryResults,save:value=>{route.query=value;}}
+  };
   function refreshSearch(input) {
-    if (filters.search === input.value) return;
-    filters.search = input.value;
-    root.querySelector('#catalog-results').innerHTML = catalogResults();
+    const view = Object.hasOwn(searchViews,input.id) && searchViews[input.id];
+    if (!view) return;
+    view.save(input.value);
+    root.querySelector(view.selector).innerHTML = view.markup();
   }
   function refreshDuplicates(input) {
     const results = document.getElementById('duplicate-results');
@@ -483,11 +542,11 @@
     results.innerHTML = duplicateResults(draft);
   }
   root.addEventListener('compositionend', event => {
-    if (event.target.id === 'catalog-search') refreshSearch(event.target);
+    if (Object.hasOwn(searchViews,event.target.id)) refreshSearch(event.target);
     else refreshDuplicates(event.target);
   });
   root.addEventListener('input', event => {
-    if (event.target.id === 'catalog-search') {
+    if (Object.hasOwn(searchViews,event.target.id)) {
       if (!event.isComposing) refreshSearch(event.target);
     } else if (event.target.closest('#editor-form') && draft) {
       draft.modified = true;
@@ -531,8 +590,12 @@
       const filterForm = document.getElementById('filters-form');
       if (filterForm) refreshFilterPreview(filterForm);
       if (draft || sheet) return;
-      if (document.activeElement?.id === 'catalog-search') root.querySelector('#catalog-results').innerHTML = catalogResults();
-      else render(pageScroll());
+      const input = document.activeElement;
+      if (input && Object.hasOwn(searchViews,input.id)) {
+        const view = searchViews[input.id];
+        root.querySelector(view.selector).innerHTML = view.markup();
+        for (const count of root.querySelectorAll('[data-favorite-count]')) count.textContent = C.favorites(state,count.dataset.favoriteCount).length;
+      } else render(pageScroll());
     } catch (error) { toast(error.message); }
     finally { reading = false; if (readQueued) refreshExternal(); }
   }
@@ -542,7 +605,7 @@
     state = data;
     const linked = PUBLIC ? routeFromLink() : route;
     const saved = history.state;
-    if (linked.name === 'detail' && saved?.atlas && saved.route.name === 'detail' && saved.route.id === linked.id) restoreNavigation(saved);
+    if (linked.id && saved?.atlas && saved.route.name === linked.name && saved.route.id === linked.id) restoreNavigation(saved);
     else { route = linked; render(); }
     refreshExternal();
   }).catch(error => {
