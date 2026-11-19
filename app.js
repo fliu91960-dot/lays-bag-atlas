@@ -143,9 +143,33 @@
       (visible.length ? '<div class="grid">' + visible.map(card).join('') + '</div>' : empty(cards.length ? '已拥有本图鉴收录的全部款' : '此批次暂无在架包装','')) + '</main>';
   }
   function option(value, label, selected) { return '<option value="' + esc(value) + '"' + (String(selected) === String(value) ? ' selected' : '') + '>' + esc(label) + '</option>'; }
+  function originalPictures(record) {
+    return [['coverImage','正面'],['backImage','背面']].filter(([key])=>record[key])
+      .map(([key,label])=>'<img src="' + esc(image(record[key])) + '" alt="投稿' + label + '原图">').join('');
+  }
+  function reviewImageLabel(key, draft) {
+    if (route.name !== 'review' || !draft.baseline) return '点击替换';
+    return draft[key] === draft.baseline[key] ? '沿用原图' : '本次替换';
+  }
+  function duplicateResults(data) {
+    const query = (data.duplicateSearch ?? (data.name || data.flavor)).trim();
+    const cards = query ? C.catalog(state,{search:query}).slice(0,6) : [];
+    return cards.map(c=>packageOption(c,'choose-duplicate',c.id === data.duplicateId)).join('') ||
+      (query ? '<p class="form-hint">没有找到相近包装</p>' : '');
+  }
+  function duplicatePicker(data, review) {
+    const chosen = review && state.chips.find(c=>c.id === data.duplicateId);
+    const selection = chosen ? '<p class="form-hint">已关联 ' + esc(chosen.name + ' · ' + chosen.market + ' · ' + chosen.packagingForm + ' · ' + (chosen.series || '')) +
+      ' ' + button('取消关联','clear-duplicate','text-btn') + '</p>' : '';
+    return '<section class="duplicate-picker"><label class="field"><span>' + (review ? '关联已有图鉴（选填）' : '查找已有包装') +
+      '</span><input type="search" id="duplicate-search" value="' + esc(data.duplicateSearch || '') + '" placeholder="名称、口味、地区或包装形态"></label>' +
+      (review ? '' : '<p class="form-hint">点选相同包装可给原卡补图，也可继续提交新版。</p>') + selection +
+      '<div id="duplicate-results">' + duplicateResults(data) + '</div></section>';
+  }
   function fieldsMarkup(data) {
-    const upload = (key,label) => '<label class="upload-tile">' + (data[key] ? '<img src="' + esc(image(data[key])) + '" alt="' + label + '预览"><span class="upload-caption">' + label + ' · 点击替换</span>' : icon('plus') + '<span>' + label + (key === 'coverImage' ? '图片' : '图片（选填）') + '</span>') + '<input type="file" accept="image/jpeg,image/png,image/webp" data-image="' + key + '" aria-label="上传' + label + '图片"></label>';
-    return '<div class="upload-pair">' + upload('coverImage','正面') + upload('backImage','背面') + '</div><p class="form-hint">支持 JPG、PNG、WebP，每张不超过 5MB。' + (data.backImage ? ' <button type="button" class="text-btn" data-action="remove-back">移除背面图</button>' : '') + '</p><label class="field"><span>包装名称</span><input name="name" required maxlength="60" placeholder="例如：原味 · 周年纪念包装" value="' + esc(data.name) + '"></label><div class="field-pair"><label class="field"><span>发行市场</span><select name="market">' + C.MARKETS.map(x => option(x,x,data.market)).join('') + '</select></label><label class="field"><span>发行年份<small>未知可留空</small></span><input name="year" inputmode="numeric" maxlength="4" placeholder="例如 2026" value="' + esc(data.year ?? '') + '"></label></div><label class="field"><span>包装形态</span><select name="packagingForm">' + C.FORMS.map(x => option(x,x,data.packagingForm)).join('') + '</select></label><span class="field-title">特殊标签<small class="muted">（可多选）</small></span><div class="checks">' + C.TAGS.map(t => '<label class="check"><input type="checkbox" name="tags" value="' + t + '"' + (data.tags.includes(t) ? ' checked' : '') + '><span>' + t + '</span></label>').join('') + '</div><div class="field-pair"><label class="field"><span>口味<small>选填</small></span><input name="flavor" maxlength="60" value="' + esc(data.flavor) + '" placeholder="例如 原味"></label><label class="field"><span>规格<small>选填</small></span><input name="specification" maxlength="60" value="' + esc(data.specification) + '" placeholder="例如 70g"></label></div><label class="field"><span>补充说明<small>选填</small></span><textarea name="description" maxlength="600" placeholder="包装差异、系列信息，或需要管理员确认的地方…">' + esc(data.description) + '</textarea></label>';
+    const removedBack = route.name === 'review' && data.baseline?.backImage && !data.backImage;
+    const upload = (key,label) => '<label class="upload-tile">' + (data[key] ? '<img src="' + esc(image(data[key])) + '" alt="' + label + '预览"><span class="upload-caption">' + label + ' · ' + reviewImageLabel(key,data) + '</span>' : icon('plus') + '<span>' + label + (key === 'coverImage' && !(route.name === 'submit' && C.hasFrontImage(data.baseline)) ? '图片' : '图片（选填）') + '</span>') + '<input type="file" accept="image/jpeg,image/png,image/webp" data-image="' + key + '" aria-label="上传' + label + '图片"></label>';
+    return '<div class="upload-pair">' + upload('coverImage','正面') + upload('backImage','背面') + '</div><p class="form-hint">支持 JPG、PNG、WebP，每张不超过 5MB。' + (route.name === 'submit' && data.coverImage ? button('撤下已选正面图','remove-front','text-btn') : '') + (data.backImage ? button(route.name === 'submit' ? '撤下已选背面图' : '移除背面图','remove-back','text-btn') : removedBack ? ' 本次移除原背面图。' : '') + '</p><label class="field"><span>包装名称</span><input name="name" required maxlength="60" placeholder="例如：原味 · 周年纪念包装" value="' + esc(data.name) + '"></label>' + (route.name === 'submit' && !data.targetChipId ? duplicatePicker(data,false) : '') + '<div class="field-pair"><label class="field"><span>发行市场</span><select name="market">' + C.MARKETS.map(x => option(x,x,data.market)).join('') + '</select></label><label class="field"><span>发行年份<small>未知可留空</small></span><input name="year" inputmode="numeric" maxlength="4" placeholder="例如 2026" value="' + esc(data.year ?? '') + '"></label></div><label class="field"><span>包装形态</span><select name="packagingForm">' + C.FORMS.map(x => option(x,x,data.packagingForm)).join('') + '</select></label><span class="field-title">特殊标签<small class="muted">（可多选）</small></span><div class="checks">' + C.TAGS.map(t => '<label class="check"><input type="checkbox" name="tags" value="' + t + '"' + (data.tags.includes(t) ? ' checked' : '') + '><span>' + t + '</span></label>').join('') + '</div><div class="field-pair"><label class="field"><span>口味<small>选填</small></span><input name="flavor" maxlength="60" value="' + esc(data.flavor) + '" placeholder="例如 原味"></label><label class="field"><span>规格<small>选填</small></span><input name="specification" maxlength="60" value="' + esc(data.specification) + '" placeholder="例如 70g"></label></div><label class="field"><span>补充说明<small>选填</small></span><textarea name="description" maxlength="600" placeholder="包装差异、系列信息，或需要管理员确认的地方…">' + esc(data.description) + '</textarea></label>';
   }
   function proposalComparison(record, target) {
     if (!target || !record?.proposedFields?.length) return '';
@@ -158,11 +182,22 @@
     const review = route.name === 'review', editing = route.name === 'edit';
     const record = review ? state.submissions.find(s => s.id === route.id) : null;
     if (!draft) prepareDraft();
-    return '<main class="page" data-screen-label="' + (review ? '审核投稿' : editing ? '编辑图鉴' : '补充图鉴') + '">' + header(review ? '整理并审核' : editing ? (route.id ? '编辑图鉴' : '新增图鉴') : '补充图鉴', '<span class="mode">' + (review || editing ? '管理员' : '投稿') + '</span>') + (draft.targetChipId ? '<p class="page-intro">正在为已有图鉴补图：' + esc(draft.name) + '</p>' : '') + (review ? '<details class="review-original"><summary>查看投稿原图与资料</summary><p>' + esc(record.name) + ' · ' + esc(record.market) + ' · ' + esc([record.year ? record.year + '年' : '年份未知',record.packagingForm,record.specification,record.flavor,...record.tags].filter(Boolean).join(' · ')) + '</p><img src="' + esc(image(record.coverImage)) + '" alt="投稿正面原图">' + (record.backImage ? '<img src="' + esc(image(record.backImage)) + '" alt="投稿背面原图">' : '') + '<p>' + esc(record.description) + '</p></details>' : !editing && !draft.targetChipId ? '<p class="page-intro">把图鉴里还没有的包装分享给大家。<br>管理员确认后，才会收录到公共图鉴。</p>' : '') + proposalComparison(record,draft.baseline) + '<form id="editor-form" class="form-content" novalidate>' + fieldsMarkup(draft) + (review ? '<label class="field"><span>审核说明<small>驳回时必填</small></span><textarea name="reviewRemark" maxlength="300" placeholder="例如：图鉴已收录，或图片需要重新拍摄">' + esc(draft.reviewRemark || '') + '</textarea></label><div class="reason-buttons">' + ['图片不清晰，请重新拍摄','该包装已收录'].map(v => button(v,'reason','','data-reason="' + esc(v) + '"')).join('') + '</div><label class="field"><span>重复投稿对应图鉴<small>选填</small></span><select name="duplicateId">' + option('','不关联','') + C.catalog(state,{}).map(c => option(c.id,c.name,draft.duplicateId)).join('') + '</select></label>' : '') + '<p class="form-error" id="form-error" role="alert"></p>' + (review ? '<div class="action-row">' + button('驳回投稿','reject','btn secondary') + '<button type="submit" class="btn">确认收录</button></div>' : '<button type="submit" class="btn full">' + (editing ? '保存图鉴' : '提交审核') + '</button>') + '</form></main>';
+    const title = review ? '整理并审核' : editing ? (route.id ? '编辑图鉴' : '新增图鉴') : '补充图鉴';
+    const undo = draft.beforeLink ? button('改为提交新版','unlink-target','text-btn') : '';
+    const target = draft.targetChipId ? '<div class="page-intro">正在为已有图鉴补图：' + esc(draft.baseline?.name || draft.name) + undo + '</div>' : '';
+    const originals = record ? '<details class="review-original"><summary>查看投稿原图与资料</summary><p>' +
+      esc([record.name,record.market,record.year ? record.year + '年' : '年份未知',record.packagingForm,record.specification,record.flavor,...record.tags].filter(Boolean).join(' · ')) +
+      '</p>' + originalPictures(record) + '<p>' + esc(record.description) + '</p></details>' : '';
+    const reviewFields = review ? '<label class="field"><span>审核说明<small>驳回时必填</small></span><textarea name="reviewRemark" maxlength="300" placeholder="例如：图鉴已收录，或图片需要重新拍摄">' + esc(draft.reviewRemark || '') + '</textarea></label>' +
+      '<div class="reason-buttons">' + ['图片不清晰，请重新拍摄','该包装已收录'].map(v => button(v,'reason','','data-reason="' + esc(v) + '"')).join('') + '</div>' + duplicatePicker(draft,true) : '';
+    const actions = review ? '<div class="action-row">' + button('驳回投稿','reject','btn secondary') + '<button type="submit" class="btn">确认收录</button></div>' :
+      '<button type="submit" class="btn full">' + (editing ? '保存图鉴' : '提交审核') + '</button>';
+    return '<main class="page" data-screen-label="' + title + '">' + header(title) + target + originals + proposalComparison(record,draft.baseline) +
+      '<form id="editor-form" class="form-content" novalidate>' + fieldsMarkup(draft) + reviewFields + '<p class="form-error" id="form-error" role="alert"></p>' + actions + '</form></main>';
   }
   function recordMarkup(record, admin) {
     const action = admin && record.status === 'pending' ? 'review' : 'submission-detail';
-    return '<button type="button" class="record" data-action="' + action + '" data-id="' + esc(record.id) + '"><img class="record-thumb" src="' + esc(image(record.coverImage)) + '" alt="' + esc(record.name) + '"><div class="record-main"><h3>' + esc(record.name) + '</h3><p>' + esc(record.market) + ' · ' + (record.year || '年份未知') + '<br>' + date(record.createTime) + (admin ? ' · ' + esc(state.users.find(u => u.id === record.userId)?.name || '收藏者') : '') + '</p>' + (record.reviewRemark ? '<p class="record-note">' + esc(record.reviewRemark) + '</p>' : '') + '<div class="record-footer"><span class="pill ' + record.status + '">' + statusName[record.status] + '</span>' + (record.chipId ? '<span class="muted">查看对应图鉴 ›</span>' : '') + '</div></div>' + icon('arrow') + '</button>';
+    return '<button type="button" class="record" data-action="' + action + '" data-id="' + esc(record.id) + '"><img class="record-thumb" src="' + esc(image(record.coverImage || record.backImage)) + '" alt="' + esc(record.name) + '"><div class="record-main"><h3>' + esc(record.name) + '</h3><p>' + esc(record.market) + ' · ' + (record.year || '年份未知') + '<br>' + date(record.createTime) + (admin ? ' · ' + esc(state.users.find(u => u.id === record.userId)?.name || '收藏者') : '') + '</p>' + (record.reviewRemark ? '<p class="record-note">' + esc(record.reviewRemark) + '</p>' : '') + '<div class="record-footer"><span class="pill ' + record.status + '">' + statusName[record.status] + '</span>' + (record.chipId ? '<span class="muted">查看对应图鉴 ›</span>' : '') + '</div></div>' + icon('arrow') + '</button>';
   }
   function historyMarkup() {
     const items = C.ownSubmissions(state).filter(s => !historyTab || s.status === historyTab);
@@ -187,7 +222,7 @@
     const form = document.getElementById('editor-form');
     if (!form || !draft) return;
     const data = new FormData(form);
-    for (const key of ['name','market','year','packagingForm','flavor','specification','description','reviewRemark','duplicateId']) if (data.has(key)) draft[key] = String(data.get(key));
+    for (const key of ['name','market','year','packagingForm','flavor','specification','description','reviewRemark']) if (data.has(key)) draft[key] = String(data.get(key));
     draft.tags = data.getAll('tags');
   }
   function pageScroll() { return root.querySelector('.page')?.scrollTop || 0; }
@@ -261,7 +296,7 @@
     if (sheet.type === 'active') content = '<p>下架后不再出现在公共图鉴中，已有收藏保留。管理员可以重新上架。</p><div class="action-row">' + button('取消','close-sheet','btn secondary') + button('确认下架','confirm-active','btn danger','data-id="' + esc(sheet.id) + '"') + '</div>';
     if (sheet.type === 'submission') {
       const s = state.submissions.find(s => s.id === sheet.id);
-      content = '<p><strong>' + esc(s.name) + '</strong><br>' + esc(s.market) + ' · ' + (s.year || '年份未知') + ' · ' + statusName[s.status] + '</p><p>' + esc(s.description || '没有补充说明') + '</p>' + (s.reviewRemark ? '<p>审核说明：' + esc(s.reviewRemark) + '</p>' : '') + '<div class="submission-images"><img src="' + esc(image(s.coverImage)) + '" alt="投稿正面原图">' + (s.backImage ? '<img src="' + esc(image(s.backImage)) + '" alt="投稿背面原图">' : '') + '</div>' + (s.chipId ? button('查看对应图鉴','detail','btn full','data-id="' + esc(s.chipId) + '"') : button('知道了','close-sheet','btn full'));
+      content = '<p><strong>' + esc(s.name) + '</strong><br>' + esc(s.market) + ' · ' + (s.year || '年份未知') + ' · ' + statusName[s.status] + '</p><p>' + esc(s.description || '没有补充说明') + '</p>' + (s.reviewRemark ? '<p>审核说明：' + esc(s.reviewRemark) + '</p>' : '') + '<div class="submission-images">' + originalPictures(s) + '</div>' + (s.chipId ? button('查看对应图鉴','detail','btn full','data-id="' + esc(s.chipId) + '"') : button('知道了','close-sheet','btn full'));
     }
     return '<div class="overlay" data-action="overlay-close"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title">' + title + '</h2>' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭弹窗"') + '</div>' + content + '</section></div>';
   }
@@ -346,8 +381,32 @@
     if (a === 'confirm-active') { sheet = null; return write(s => C.setActive(s,id,false),'图鉴已下架，收藏记录保留'); }
     if (a === 'stat') { favoriteTab = el.dataset.name; return go('favorites'); }
     if (a === 'about') { sheet = {type:a}; return render(pageScroll()); }
+    if (a === 'choose-duplicate') {
+      const chip = state.chips.find(card=>card.id === id && card.active !== false);
+      if (!draft || !chip) return;
+      updateDraft();
+      if (route.name === 'review') draft.duplicateId = id;
+      else if (route.name === 'submit' && !draft.targetChipId) {
+        const form = C.cleanFields(chip,false);
+        draft = {...form,baseline:chip,targetChipId:id,coverImage:draft.coverImage,backImage:draft.backImage,beforeLink:draft};
+      }
+      draft.modified = true;
+      return render(pageScroll());
+    }
+    if (a === 'unlink-target' && draft?.beforeLink) {
+      updateDraft();
+      draft = {...draft.beforeLink,coverImage:draft.coverImage,backImage:draft.backImage,modified:true};
+      return render(pageScroll());
+    }
+    if (a === 'clear-duplicate' && draft) {
+      updateDraft(); draft.duplicateId = ''; draft.modified = true;
+      return render(pageScroll());
+    }
     if (a === 'reason') { updateDraft(); draft.reviewRemark = el.dataset.reason; draft.modified = true; return render(pageScroll()); }
-    if (a === 'remove-back') { updateDraft(); draft.backImage = ''; draft.modified = true; return render(pageScroll()); }
+    if ((a === 'remove-back' || a === 'remove-front') && draft) {
+      updateDraft(); draft[a === 'remove-back' ? 'backImage' : 'coverImage'] = ''; draft.modified = true;
+      return render(pageScroll());
+    }
     if (a === 'reject') {
       updateDraft();
       try {
@@ -363,8 +422,9 @@
     if (event.target.id !== 'editor-form') return;
     updateDraft(); const errorElement = document.getElementById('form-error'); errorElement.textContent = '';
     try {
-      const fields = C.cleanFields(draft,true);
-      if (route.name !== 'review' && fields.coverImage.startsWith('assets/') && !route.id) throw new Error('请上传自己的包装正面图片');
+      const fields = C.cleanFields(draft,route.name !== 'submit');
+      if ((route.name === 'submit' || (route.name === 'edit' && !route.id)) &&
+          [fields.coverImage,fields.backImage].some(value=>value.startsWith('assets/'))) throw new Error('请上传自己拍摄的包装图片');
       let operation;
       if (route.name === 'submit') operation = s => C.submit(s,Object.assign({},fields,{targetChipId:draft.targetChipId || ''}),draft.baseline);
       if (route.name === 'edit') operation = s => C.saveChip(s,route.id,fields,draft.baseline);
@@ -382,11 +442,25 @@
     filters.search = input.value;
     root.querySelector('#catalog-results').innerHTML = catalogResults();
   }
-  root.addEventListener('compositionend', event => { if (event.target.id === 'catalog-search') refreshSearch(event.target); });
+  function refreshDuplicates(input) {
+    const results = document.getElementById('duplicate-results');
+    if (!results || !draft) return;
+    if (input.id === 'duplicate-search') draft.duplicateSearch = input.value;
+    else if (route.name === 'submit' && (input.name === 'name' || input.name === 'flavor')) draft[input.name] = input.value;
+    else return;
+    results.innerHTML = duplicateResults(draft);
+  }
+  root.addEventListener('compositionend', event => {
+    if (event.target.id === 'catalog-search') refreshSearch(event.target);
+    else refreshDuplicates(event.target);
+  });
   root.addEventListener('input', event => {
     if (event.target.id === 'catalog-search') {
       if (!event.isComposing) refreshSearch(event.target);
-    } else if (event.target.closest('#editor-form') && draft) { draft.modified = true; }
+    } else if (event.target.closest('#editor-form') && draft) {
+      draft.modified = true;
+      if (!event.isComposing) refreshDuplicates(event.target);
+    }
   });
   root.addEventListener('change', async event => {
     const input = event.target;

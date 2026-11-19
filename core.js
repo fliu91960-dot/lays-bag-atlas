@@ -178,6 +178,9 @@
     return typeof value === 'string' && value.length <= 8 * 1024 * 1024 &&
       (/^assets\/[a-z0-9_-]+\.(png|jpg|webp)$/.test(value) || /^data:image\/(png|jpeg|webp);base64,[a-zA-Z0-9+/=]+$/.test(value));
   }
+  function hasFrontImage(card) {
+    return !!card && !card.imagePending && card.coverImage !== 'assets/unknown.png' && validImage(card.coverImage);
+  }
   function cleanFields(input, requireImage) {
     const name = String(input.name || '').trim();
     const yearText = input.year === null || input.year === undefined ? '' : String(input.year).trim();
@@ -275,10 +278,11 @@
     return key === 'tags' ? left.length === right.length && left.every(tag => right.includes(tag)) : left === right;
   }
   function submit(state, fields, openedTarget) {
-    const data = cleanFields(fields, true);
     const targetChipId = String(fields.targetChipId || '');
     const target = targetChipId && state.chips.find(c => c.id === targetChipId && c.active !== false);
     assert(!targetChipId || target, '要补图的图鉴不存在或已下架');
+    const data = cleanFields(fields, !hasFrontImage(target));
+    assert(data.coverImage || data.backImage, '请至少上传一张包装图片');
     if (target) {
       const baseline = cleanFields(openedTarget || target, false);
       data.proposedFields = Object.keys(baseline).filter(key => key !== 'coverImage' && key !== 'backImage' && !sameField(key,baseline[key],data[key]));
@@ -295,7 +299,7 @@
     for (const key of record.proposedFields || []) {
       if (Object.hasOwn(fields,key) && key !== 'coverImage' && key !== 'backImage') fields[key] = record[key];
     }
-    fields.coverImage = record.coverImage;
+    fields.coverImage = record.coverImage || fields.coverImage;
     fields.backImage = record.backImage || fields.backImage;
     return fields;
   }
@@ -410,9 +414,9 @@
     const pairs = new Set();
     for (const f of value.favorites) { const key = f.userId + ':' + f.chipId; assert(!pairs.has(key) && ['owned', 'wanted'].includes(f.status) && value.users.some(u => u.id === f.userId) && seen.has(f.chipId), '备份收藏关系不正确'); pairs.add(key); }
     const submissionIds = new Set();
-    for (const submission of value.submissions) { assert(submission && ['pending', 'approved', 'rejected'].includes(submission.status) && users.has(submission.userId) && typeof submission.id === 'string' && /^[a-zA-Z0-9_-]+$/.test(submission.id) && !submissionIds.has(submission.id), '备份投稿格式不正确'); cleanFields(submission, true); assert(submission.status !== 'approved' || seen.has(submission.chipId), '备份投稿缺少已收录图鉴'); assert(!submission.chipId || seen.has(submission.chipId), '备份投稿关联不存在'); assert(typeof submission.reviewRemark === 'string' && submission.reviewRemark.length <= 300, '审核说明格式不正确'); submissionIds.add(submission.id); }
+    for (const submission of value.submissions) { assert(submission && ['pending', 'approved', 'rejected'].includes(submission.status) && users.has(submission.userId) && typeof submission.id === 'string' && /^[a-zA-Z0-9_-]+$/.test(submission.id) && !submissionIds.has(submission.id), '备份投稿格式不正确'); cleanFields(submission, !submission.targetChipId); assert(submission.coverImage || submission.backImage, '投稿缺少图片'); assert(submission.status !== 'approved' || seen.has(submission.chipId), '备份投稿缺少已收录图鉴'); assert(!submission.chipId || seen.has(submission.chipId), '备份投稿关联不存在'); assert(typeof submission.reviewRemark === 'string' && submission.reviewRemark.length <= 300, '审核说明格式不正确'); submissionIds.add(submission.id); }
     return clone(value);
   }
   return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, homeCatalog, relatedPackaging, resolvePublicChip, favorites, favoriteStatus, setFavorite,
-    submit, ownSubmissions, reviewFields, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, validateState };
+    submit, ownSubmissions, reviewFields, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, hasFrontImage, validateState };
 });
