@@ -95,9 +95,14 @@
   }
   function detailMarkup() {
     const chip = state.chips.find(c => c.id === route.id);
+    if (route.fromLink && (!chip || chip.active === false)) {
+      const message = chip ? '这款包装已下架' : '找不到此包装';
+      return '<main class="page">' + header('图鉴详情') + empty(message,'返回图鉴可继续查看其他包装。',button('返回图鉴','back','btn')) + '</main>';
+    }
     if (!chip) return '<main class="page">' + header('图鉴详情') + empty('图鉴不存在', '返回列表后再试。') + '</main>';
     const status = C.favoriteStatus(state,chip.id);
-    const edit = !PUBLIC && C.user(state).role !== 'user' ? button(icon('edit'),'edit','back','aria-label="编辑图鉴" data-id="' + esc(chip.id) + '"') : '';
+    const edit = !PUBLIC && C.user(state).role !== 'user' ? button(icon('edit'),'edit','back','aria-label="编辑图鉴" data-id="' + esc(chip.id) + '"')
+      : PUBLIC && chip.active !== false && location.protocol !== 'file:' ? button('复制单品链接','share-chip','btn secondary') : '';
     const pending = side === 'coverImage' && chip.imagePending;
     const picture = pending ? '<div class="image-pending">' + icon('bag') + '<span>正面图片待补</span></div>' : '<img src="' + esc(image(chip[side] || chip.coverImage)) + '" alt="' + esc(chip.name) + (side === 'backImage' ? '背面' : '正面') + '">' + button(icon('zoom'),'zoom','zoom','aria-label="放大包装图片"');
     const switcher = chip.backImage ? '<div class="image-switch">' + [['coverImage','正面'],['backImage','背面']].map(([key,title]) => button(title,'side',side === key ? 'active' : '', 'data-side="' + key + '" aria-pressed="' + (side === key) + '"')).join('') + '</div>' : '';
@@ -111,11 +116,31 @@
     const rows = facts.map(([label,value]) => '<div><dt>' + label + '</dt><dd>' + esc(value) + '</dd></div>').join('');
     const imageSource = safeSource(chip.sourceUrl) ? '<p class="source-note">图片来源：<a target="_blank" rel="noopener noreferrer" href="' + esc(chip.sourceUrl) + '">' + esc(chip.sourceLabel || '素材来源') + ' ↗</a></p>' : '';
     const contribute = !PUBLIC && chip.active !== false ? button(icon('upload') + '补充包装图片','contribute','btn secondary full','data-id="' + esc(chip.id) + '"') : '';
+    const batchLink = chip.releaseBatch ? button('查看同批包装 ' + icon('arrow'),'open-batch','btn secondary full') : '';
+    const versions = C.relatedPackaging(state,chip.id);
+    const cue = chip.id === 'wasabi-jm' ? '<p class="description">袋面口号「芥么离谱」可用于辨认这版夏季限定。</p>' : '';
+    const related = versions.length ? '<section class="related-packaging"><h2>同口味其他包装</h2>' + cue + versions.map(c=>packageOption(c,'detail')).join('') + '</section>' : '';
     const actions = chip.active === false
       ? (status ? button('取消收藏','favorite','btn secondary full','data-status=""') : '<p class="form-hint">这款图鉴已下架。</p>')
       : button(icon('check') + (status === 'owned' ? '已拥有' : '标记拥有'),'favorite','btn ' + (status === 'owned' ? 'on-owned' : 'secondary'),'data-status="owned" aria-pressed="' + (status === 'owned') + '"')
         + button(icon('heart') + (status === 'wanted' ? '已加入心愿' : '想要收藏'),'favorite','btn ' + (status === 'wanted' ? 'on-wanted' : ''),'data-status="wanted" aria-pressed="' + (status === 'wanted') + '"');
-    return '<main class="page" data-screen-label="图鉴详情">' + header('图鉴详情',edit) + '<div class="detail-layout"><div><div class="detail-hero">' + picture + '</div>' + switcher + '</div><article class="detail-info"><h1>' + esc(chip.name) + '</h1><div class="tag-row">' + tags(chip) + (chip.active === false ? '<span class="tag">已下架</span>' : '') + '</div><dl class="detail-fields">' + rows + '</dl>' + (chip.description ? '<p class="description">' + esc(chip.description) + '</p>' : '') + imageSource + historyMarkupFor(chip) + contribute + '</article></div></main><div class="sticky-actions"><div class="action-row">' + actions + '</div></div>';
+    return '<main class="page" data-screen-label="图鉴详情">' + header('图鉴详情',edit) + '<div class="detail-layout"><div><div class="detail-hero">' + picture + '</div>' + switcher + '</div><article class="detail-info"><h1>' + esc(chip.name) + '</h1><div class="tag-row">' + tags(chip) + (chip.active === false ? '<span class="tag">已下架</span>' : '') + '</div>' + batchLink + '<dl class="detail-fields">' + rows + '</dl>' + related + (chip.description ? '<p class="description">' + esc(chip.description) + '</p>' : '') + imageSource + historyMarkupFor(chip) + contribute + '</article></div></main><div class="sticky-actions"><div class="action-row">' + actions + '</div></div>';
+  }
+  function packageOption(chip, action, selected = false) {
+    const specs = [chip.market,chip.packagingForm,chip.series,C.packageWeights(chip).join(' / ')].filter(Boolean);
+    if (chip.year) specs.push(chip.year + '年');
+    return button('<img src="' + esc(image(chip.coverImage)) + '" alt="" loading="lazy"><span><strong>' + esc(chip.name) + '</strong><small>' + esc(specs.join(' · ')) + '</small></span>',
+      action,'package-option' + (selected ? ' selected' : ''),'data-id="' + esc(chip.id) + '"' + (action === 'choose-duplicate' ? ' aria-pressed="' + selected + '"' : ''));
+  }
+  function batchMarkup() {
+    const cards = C.homeCatalog(state,{releaseBatch:route.batch});
+    const owned = new Set(C.favorites(state,'owned').map(chip=>chip.id));
+    const count = cards.filter(chip=>owned.has(chip.id)).length;
+    const visible = route.onlyMissing ? cards.filter(chip=>!owned.has(chip.id)) : cards;
+    const progress = cards.length ? '<p class="batch-progress">已拥有 <strong>' + count + '/' + cards.length + '</strong> 款 · 本图鉴收录 ' + cards.length + ' 款</p>' : '';
+    return '<main class="page" data-screen-label="发行批次">' + header(route.batch) + '<div class="batch-controls">' + progress +
+      button('只看未拥有','batch-missing','btn secondary','aria-pressed="' + !!route.onlyMissing + '"') + '</div>' +
+      (visible.length ? '<div class="grid">' + visible.map(card).join('') + '</div>' : empty(cards.length ? '已拥有本图鉴收录的全部款' : '此批次暂无在架包装','')) + '</main>';
   }
   function option(value, label, selected) { return '<option value="' + esc(value) + '"' + (String(selected) === String(value) ? ' selected' : '') + '>' + esc(label) + '</option>'; }
   function fieldsMarkup(data) {
@@ -169,6 +194,22 @@
   function navigationState() {
     return {atlas:true,route,trail,filters,favoriteTab,scrollTop:pageScroll()};
   }
+  function chipUrl(id) {
+    const url = new URL(location.href);
+    url.search = '';
+    url.hash = '/chip/' + encodeURIComponent(id);
+    return url.href;
+  }
+  function routeFromLink() {
+    if (!/^#\/chip(?:\/|$)/.test(location.hash)) return {name:'catalog'};
+    const id = location.hash.slice('#/chip/'.length);
+    return {name:'detail',id:C.resolvePublicChip(state,id)?.id || id,fromLink:true};
+  }
+  function routeUrl() {
+    const url = new URL(location.href);
+    url.hash = route.name === 'detail' ? '/chip/' + encodeURIComponent(route.id) : '';
+    return url.href;
+  }
   function go(name, args) {
     if (PUBLIC) history.replaceState(navigationState(),'');
     if (['catalog','favorites','profile'].includes(name)) trail = [];
@@ -176,7 +217,7 @@
     route = Object.assign({name},args || {}); side = 'coverImage'; sheet = null;
     draft = null; if (['submit','edit','review'].includes(name)) prepareDraft();
     render();
-    if (PUBLIC) history.pushState(navigationState(),'');
+    if (PUBLIC) history.pushState(navigationState(),'',routeUrl());
   }
   function back(force) {
     if (PUBLIC && trail.length && history.state?.atlas) { history.back(); return; }
@@ -184,12 +225,18 @@
     const previous = trail.pop();
     route = previous?.route || {name:'catalog'}; draft = null; sheet = null; side = 'coverImage';
     render(previous?.scrollTop);
+    if (PUBLIC) history.replaceState(navigationState(),'',routeUrl());
+  }
+  function restoreNavigation(saved) {
+    ({route,trail,filters,favoriteTab} = saved);
+    sheet = null; side = 'coverImage';
+    render(saved.scrollTop);
   }
   if (PUBLIC) window.addEventListener('popstate', event => {
-    if (!state || !event.state?.atlas) return;
-    ({route,trail,filters,favoriteTab} = event.state);
-    sheet = null; side = 'coverImage';
-    render(event.state.scrollTop);
+    if (!state) return;
+    if (event.state?.atlas) return restoreNavigation(event.state);
+    route = routeFromLink(); trail = []; sheet = null; side = 'coverImage';
+    render();
   });
   function sheetMarkup() {
     if (!sheet) return '';
@@ -197,8 +244,9 @@
       const chip = state.chips.find(c => c.id === route.id);
       return '<div class="viewer" role="dialog" aria-modal="true" aria-label="包装大图">' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭大图"') + '<img src="' + esc(image(chip?.[side] || chip?.coverImage)) + '" alt="包装大图"><p>' + esc(chip?.name || '') + '</p></div>';
     }
-    const title = {filters:'筛选图鉴',about:'关于图鉴',discard:'放弃这次修改？',active:'下架这款图鉴？',submission:'投稿详情'}[sheet.type] || '';
+    const title = {filters:'筛选图鉴',about:'关于图鉴',discard:'放弃这次修改？',active:'下架这款图鉴？',submission:'投稿详情',share:'单品链接'}[sheet.type] || '';
     let content = '';
+    if (sheet.type === 'share') content = '<label class="field"><span>选择并复制地址</span><input id="share-url" readonly value="' + esc(chipUrl(route.id)) + '"></label>';
     if (sheet.type === 'filters') {
       const select = (key,label,values,all) => '<label class="field"><span>' + label + '</span><select name="' + key + '">' + option('',all || '全部',filters[key]) + values.map(v => option(Array.isArray(v) ? v[0] : v,Array.isArray(v) ? v[1] : v,filters[key])).join('') + '</select></label>';
       const active = C.homeCatalog(state);
@@ -218,7 +266,7 @@
     return '<div class="overlay" data-action="overlay-close"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title">' + title + '</h2>' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭弹窗"') + '</div>' + content + '</section></div>';
   }
   function render(scrollTop = 0) {
-    const functions = {catalog:catalogMarkup,favorites:favoritesMarkup,profile:profileMarkup,detail:detailMarkup,submit:editorMarkup,edit:editorMarkup,review:editorMarkup,history:historyMarkup,admin:adminMarkup};
+    const functions = {catalog:catalogMarkup,favorites:favoritesMarkup,profile:profileMarkup,detail:detailMarkup,batch:batchMarkup,submit:editorMarkup,edit:editorMarkup,review:editorMarkup,history:historyMarkup,admin:adminMarkup};
     root.innerHTML = (functions[route.name] || catalogMarkup)() + sheetMarkup();
     const page = root.querySelector('.page'); if (page) { page.scrollTop = scrollTop; if (sheet) page.setAttribute('inert',''); }
     if (sheet) { root.querySelector('.bottom-nav')?.setAttribute('inert',''); root.querySelector('.sticky-actions')?.setAttribute('inert',''); root.querySelector('.sheet-close')?.focus({preventScroll:true}); }
@@ -256,6 +304,22 @@
     if (a === 'back') return back();
     if (a === 'discard') return back(true);
     if (a === 'detail') return go('detail',{id});
+    if (a === 'open-batch') {
+      const batch = state.chips.find(c=>c.id === route.id)?.releaseBatch;
+      if (batch) go('batch',{batch,onlyMissing:false});
+      return;
+    }
+    if (a === 'batch-missing') { route.onlyMissing = !route.onlyMissing; return render(); }
+    if (a === 'share-chip') {
+      const current = route;
+      try { await navigator.clipboard.writeText(chipUrl(current.id)); toast('已复制单品链接'); }
+      catch (_) {
+        if (route !== current) return;
+        sheet = {type:'share'}; render(pageScroll());
+        const input = document.getElementById('share-url'); input.focus(); input.select();
+      }
+      return;
+    }
     if (a === 'side') { side = el.dataset.side; return render(pageScroll()); }
     if (a === 'zoom') { sheet = {type:'zoom'}; return render(pageScroll()); }
     if (a === 'filters') { sheet = {type:'filters'}; return render(pageScroll()); }
@@ -365,7 +429,14 @@
   }
   R.onExternalChange(queueExternalRead);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) queueExternalRead(); });
-  R.initialize().then(data => { state = data; render(); refreshExternal(); }).catch(error => {
+  R.initialize().then(data => {
+    state = data;
+    const linked = PUBLIC ? routeFromLink() : route;
+    const saved = history.state;
+    if (linked.name === 'detail' && saved?.atlas && saved.route.name === 'detail' && saved.route.id === linked.id) restoreNavigation(saved);
+    else { route = linked; render(); }
+    refreshExternal();
+  }).catch(error => {
     root.innerHTML = '<main class="error-screen"><h2>暂时无法打开图鉴</h2><p>' + esc(error.message) + '</p><p>如果此前使用过，请保留当前浏览器数据，先检查存储权限。</p><button class="btn" id="retry">重新打开</button></main>';
     document.getElementById('retry').onclick = () => location.reload();
   });

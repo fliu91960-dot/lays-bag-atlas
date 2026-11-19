@@ -83,3 +83,16 @@ body { display: block; background: var(--bg); }
 .review-diff { width: 100%; margin-top: 8px; table-layout: fixed; border-collapse: collapse; color: var(--ink); font-size: 13px; }
 .review-diff th, .review-diff td { padding: 6px 4px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
 .review-diff th:first-child { width: 22%; }
+.related-packaging { margin: 20px 0; }
+.related-packaging h2 { font-size: 17px; }
+.package-option {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  margin-top: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: #fff;
+}
+.package-option.selected { border-color: #9b751d; background: #fff8de; }
+.package-option img { width: 54px; height: 62px; object-fit: contain; }
+.package-option span { min-width: 0; overflow-wrap: anywhere; }
+.package-option small { display: block; margin-top: 4px; color: var(--muted); }
+.batch-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 0 var(--gutter) 16px; }
+.batch-progress { font-size: 14px; }
+.batch-controls [aria-pressed="true"] { background: #fff1bd; border-color: #9b751d; }

@@ -198,17 +198,27 @@
       description: String(input.description || '').trim(), coverImage: input.coverImage || '', backImage: input.backImage || '' };
   }
   function packageWeights(item) {
-    const grams = text => [...new Set(Array.from(String(text || '').matchAll(/(\d+(?:\.\d+)?)\s*(?:g\b|克)/gi), match => Number(match[1]) + 'g'))];
+    const grams = text => [...new Set(Array.from(normalizeSearch(text).matchAll(/(\d+(?:\.\d+)?)\s*(?:g\b|克)/g), match => Number(match[1]) + 'g'))];
     const pictured = grams(item.imageSpecification);
     return pictured.length ? pictured : grams(item.specification);
   }
+  function normalizeSearch(value) {
+    return String(value ?? '').normalize('NFKC').toLowerCase()
+      .replace(/泡泡瑪特/g,'泡泡玛特').replace(/臺灣|台灣|臺湾/g,'台湾').replace(/香港特別行政區/g,'香港');
+  }
   function catalog(state, filters) {
     const f = filters || {};
-    const words = String(f.search || '').trim().toLowerCase().split(/\s+/).filter(Boolean);
+    const query = normalizeSearch(f.search);
+    const weights = [];
+    const words = query.replace(/(?<![\d.])(\d+(?:\.\d+)?)\s*(?:g\b|克)/g, (_, grams) => {
+      weights.push(Number(grams) + 'g');
+      return ' ';
+    }).trim().split(/\s+/).filter(Boolean);
+    if (f.specification) weights.push(f.specification);
     return state.chips.filter(item => item.active !== false)
       .filter(item => {
         if (!words.length) return true;
-        const text = [item.name, item.flavor, item.series, item.releaseBatch, ...item.tags].join(' ').toLowerCase();
+        const text = normalizeSearch([item.name, item.flavor, item.market, item.packagingForm, item.series, item.releaseBatch, ...item.tags].join(' '));
         return words.every(word => text.includes(word));
       })
       .filter(item => !f.market || item.market === f.market)
@@ -216,9 +226,17 @@
       .filter(item => !f.packagingForm || item.packagingForm === f.packagingForm)
       .filter(item => !f.series || item.series === f.series)
       .filter(item => !f.releaseBatch || item.releaseBatch === f.releaseBatch)
-      .filter(item => !f.specification || packageWeights(item).includes(f.specification))
+      .filter(item => !weights.length || weights.every(weight => packageWeights(item).includes(weight)))
       .filter(item => !f.tag || (f.tag === '常规' ? item.tags.length === 0 :
         item.tags.includes(f.tag) || (f.tag === '限定' && item.tags.includes('城市限定'))));
+  }
+  function relatedPackaging(state, id) {
+    const group = ['official-cn-10','wasabi-jm'];
+    return group.includes(id) ? catalog(state).filter(card=>card.id !== id && group.includes(card.id)) : [];
+  }
+  function resolvePublicChip(state, id) {
+    const target = MERGED_CARDS.find(([oldId])=>oldId === id)?.[1] || id;
+    return state.chips.find(card=>card.id === target && card.active !== false);
   }
   function homeCatalog(state, filters) {
     const latest = state.chips.reduce((year, item) =>
@@ -395,6 +413,6 @@
     for (const submission of value.submissions) { assert(submission && ['pending', 'approved', 'rejected'].includes(submission.status) && users.has(submission.userId) && typeof submission.id === 'string' && /^[a-zA-Z0-9_-]+$/.test(submission.id) && !submissionIds.has(submission.id), '备份投稿格式不正确'); cleanFields(submission, true); assert(submission.status !== 'approved' || seen.has(submission.chipId), '备份投稿缺少已收录图鉴'); assert(!submission.chipId || seen.has(submission.chipId), '备份投稿关联不存在'); assert(typeof submission.reviewRemark === 'string' && submission.reviewRemark.length <= 300, '审核说明格式不正确'); submissionIds.add(submission.id); }
     return clone(value);
   }
-  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, homeCatalog, favorites, favoriteStatus, setFavorite,
+  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, homeCatalog, relatedPackaging, resolvePublicChip, favorites, favoriteStatus, setFavorite,
     submit, ownSubmissions, reviewFields, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, validateState };
 });
