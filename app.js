@@ -45,13 +45,13 @@
   function header(title, end) { return '<header class="sub-header">' + button(icon('back'), 'back', 'back', 'aria-label="返回"') + '<h2>' + esc(title) + '</h2>' + (end ? '<div class="header-end">' + end + '</div>' : '') + '</header>'; }
   function navigation() { return '<nav class="bottom-nav" aria-label="主要导航">' + [['catalog','grid','图鉴'],['favorites','bookmark','我的收藏'],['profile','user','我的']].map(([name, i, text]) => button('<span class="nav-icon">' + icon(i) + '</span><span>' + text + '</span>', 'nav', route.name === name ? 'active' : '', 'data-name="' + name + '" aria-current="' + (route.name === name ? 'page' : 'false') + '"')).join('') + '</nav>'; }
   function empty(title, message, action) { return '<div class="empty">' + icon('bag') + '<strong>' + esc(title) + '</strong><p>' + esc(message) + '</p>' + (action || '') + '</div>'; }
-  function tags(item, onCard = false) {
+  function tags(item, onCard = false, showBatch = true) {
     const batch = item.releaseBatch;
     const names = item.tags.filter(tag =>
       !batch?.includes(tag) && !(tag === '联名' && batch?.includes('聯名')) &&
       !(tag === '限定' && item.tags.includes('城市限定')));
     const style = onCard ? 'edition' : 'tag';
-    const badge = batch ? '<span class="' + style + (onCard ? ' edition-batch' : '') + '">' + esc(batch) + '</span>' : '';
+    const badge = batch && showBatch ? '<span class="' + style + (onCard ? ' edition-batch' : '') + '">' + esc(batch) + '</span>' : '';
     if (!batch && names.length === 0 && !onCard) return '<span class="tag">常规</span>';
     return badge + names.map(tag => '<span class="' + style + '">' + esc(tag) + '</span>').join('');
   }
@@ -60,16 +60,16 @@
     const year = item.firstSeenYear || item.flavorDocumentedYear;
     return year ? '口味首见：' + year + '年' + (item.firstSeenProvisional ? '（待核）' : '') : '年份待核实';
   }
-  function card(item) {
+  function card(item, showBatch) {
     const status = C.favoriteStatus(state, item.id);
-    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(C.packageWeights(item).join(' / ') || '规格待核实') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + tags(item, true) + '</div></button>';
+    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(C.packageWeights(item).join(' / ') || '规格待核实') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + tags(item,true,showBatch) + '</div></button>';
   }
   function filterLabel(key, value) {
     if (key === 'year' && value === 'unknown') return '包装年份待核实';
     const options = {collection:collectionOptions,imageStatus:imageOptions,order:orderOptions}[key];
     return options?.find(([id])=>id === value)?.[1] || value;
   }
-  function cardGrid(items) { return '<div class="grid">' + items.map(card).join('') + '</div>'; }
+  function cardGrid(items, showBatch = true) { return '<div class="grid">' + items.map(item=>card(item,showBatch)).join('') + '</div>'; }
   function yearGroups(items, order, markup, unit = '款') {
     return C.packagingYearGroups(items,order).map(([year,group]) =>
       '<section class="year-group" data-year="' + (year || 'unknown') + '"><h2><span>' +
@@ -178,7 +178,7 @@
     const source = safeSource(batch.sourceUrl) ? '<p class="batch-source source-note"><a href="' + esc(batch.sourceUrl) + '" target="_blank" rel="noopener noreferrer">批次资料 ↗</a></p>' : '';
     return '<main class="page" data-screen-label="发行批次">' + header(batch.name,share) + '<div class="batch-controls">' + progress +
       button('只看未拥有','batch-missing','btn secondary','aria-pressed="' + !!route.onlyMissing + '"') + '</div>' +
-      (visible.length ? cardGrid(visible) : empty('已拥有本图鉴收录的全部款','')) + source + '</main>';
+      (visible.length ? cardGrid(visible,false) : empty('已拥有本图鉴收录的全部款','')) + source + '</main>';
   }
   function batchDirectoryResults() {
     const batches = C.releaseBatches(state,route.query);
