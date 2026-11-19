@@ -29,7 +29,11 @@
   const date = value => { const d = new Date(value); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('zh-CN'); };
   const statusName = { pending:'待审核', approved:'已收录', rejected:'未通过' };
   let state, route = { name:'catalog' }, trail = [], sheet = null, draft = null, busy = false;
-  let filters = { search:'', tag:'', market:'', year:'', packagingForm:'', specification:'', series:'', releaseBatch:'' }, favoriteTab = 'owned', adminTab = 'pending', historyTab = '';
+  const collectionOptions = [['missing','未拥有'],['owned','已拥有'],['wanted','想要收藏']];
+  const imageOptions = [['ready','已有封面'],['pending','封面待补']];
+  const filterKeys = ['market','year','series','packagingForm','specification','tag','releaseBatch','collection','imageStatus'];
+  const defaultFilters = () => ({search:'', ...Object.fromEntries(filterKeys.map(key=>[key,'']))});
+  let filters = defaultFilters(), favoriteTab = 'owned', adminTab = 'pending', historyTab = '';
   let side = 'coverImage', toastTimer;
   function toast(message) {
     root.querySelector('.toast')?.remove();
@@ -59,12 +63,16 @@
     const status = C.favoriteStatus(state, item.id);
     return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(C.packageWeights(item).join(' / ') || '规格待核实') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + tags(item, true) + '</div></button>';
   }
-  const filterKeys = ['market','year','series','packagingForm','specification','tag','releaseBatch'];
+  function filterLabel(key, value) {
+    if (key === 'year' && value === 'unknown') return '包装年份待核实';
+    const options = {collection:collectionOptions,imageStatus:imageOptions}[key];
+    return options?.find(([id])=>id === value)?.[1] || value;
+  }
   function catalogResults() {
     const items = C.homeCatalog(state, filters);
     const selected = filterKeys.filter(key => filters[key]);
     const summary = selected.map(key => {
-      const value = filters[key] === 'unknown' ? '包装年份待核实' : filters[key];
+      const value = filterLabel(key,filters[key]);
       return button(esc(value) + ' ×', 'remove-filter', '', 'data-key="' + key + '" aria-label="移除筛选 ' + esc(value) + '"');
     }).join('');
     const heading = '<div class="catalog-heading"><strong>' + (selected.length || filters.search ? '筛选结果' : '全部图鉴') + ' <span class="muted">' + items.length + '</span></strong>' + (PUBLIC ? '' : button(icon('plus') + '补充图鉴', 'submit', 'text-btn')) + '</div>';
@@ -283,13 +291,24 @@
     let content = '';
     if (sheet.type === 'share') content = '<label class="field"><span>选择并复制地址</span><input id="share-url" readonly value="' + esc(chipUrl(route.id)) + '"></label>';
     if (sheet.type === 'filters') {
-      const select = (key,label,values,all) => '<label class="field"><span>' + label + '</span><select name="' + key + '">' + option('',all || '全部',filters[key]) + values.map(v => option(Array.isArray(v) ? v[0] : v,Array.isArray(v) ? v[1] : v,filters[key])).join('') + '</select></label>';
+      const select = (key,label,values,all) => '<label class="field' + (key === 'releaseBatch' ? ' filter-wide' : '') + '"><span>' + label + '</span><select name="' + key + '">' + option('',all,filters[key] || '') + values.map(v => option(Array.isArray(v) ? v[0] : v,Array.isArray(v) ? v[1] : v,filters[key])).join('') + '</select></label>';
       const active = C.homeCatalog(state);
       const series = [...new Set(active.map(c => c.series).filter(Boolean))];
       const weights = [...new Set(active.flatMap(C.packageWeights))].sort((a,b) => parseFloat(a)-parseFloat(b));
       const years = [...new Set(active.map(c => c.year).filter(Boolean))].sort((a,b) => a-b);
       const batches = [...new Set(active.map(c => c.releaseBatch).filter(Boolean))];
-      content = '<form id="filters-form">' + select('market','地区',[...new Set(active.map(c => c.market))],'全部地区') + select('year','包装年份',[...years,['unknown','待核实']],'全部年份') + select('series','产品系列',series,'全部系列') + select('packagingForm','包装形态',[...new Set(active.map(c => c.packagingForm))],'全部形态') + select('specification','净含量（优先按图示）',weights,'全部规格') + select('tag','款式',['常规',...C.TAGS],'全部款式') + select('releaseBatch','发行批次',batches,'全部批次') + '<div class="action-row">' + button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></form>';
+      content = '<form id="filters-form">' +
+        select('market','地区',[...new Set(active.map(c => c.market))],'全部地区') +
+        select('year','包装年份',[...years,['unknown','待核实']],'全部年份') +
+        select('series','产品系列',series,'全部系列') +
+        select('packagingForm','包装形态',[...new Set(active.map(c => c.packagingForm))],'全部形态') +
+        select('specification','净含量（优先按图示）',weights,'全部规格') +
+        select('tag','款式',['常规',...C.TAGS],'全部款式') +
+        select('collection','收藏状态',collectionOptions,'全部状态') +
+        select('imageStatus','展示图片',imageOptions,'全部图片') +
+        select('releaseBatch','发行批次',batches,'全部批次') +
+        '<div class="filter-actions"><output id="filter-preview" aria-live="polite">' + matchingCount(filters) + '</output><div class="action-row">' +
+        button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></div></form>';
     }
     if (sheet.type === 'about') content = '<p>图鉴当前收录 ' + C.catalog(state).length + ' 条产品记录，包含不同市场、系列及包装形态。筛选支持年份、系列、袋装／罐装与净含量。详情保留素材来源。</p><p>收藏中预放了一组展示记录，可自行调整。图片和操作保存在当前浏览器。</p>' + button('知道了','close-sheet','btn full');
     if (sheet.type === 'discard') content = '<p>尚未保存的资料和图片会被放弃。</p><div class="action-row">' + button('继续填写','close-sheet','btn secondary') + button('放弃修改','discard','btn danger') + '</div>';
@@ -299,6 +318,16 @@
       content = '<p><strong>' + esc(s.name) + '</strong><br>' + esc(s.market) + ' · ' + (s.year || '年份未知') + ' · ' + statusName[s.status] + '</p><p>' + esc(s.description || '没有补充说明') + '</p>' + (s.reviewRemark ? '<p>审核说明：' + esc(s.reviewRemark) + '</p>' : '') + '<div class="submission-images">' + originalPictures(s) + '</div>' + (s.chipId ? button('查看对应图鉴','detail','btn full','data-id="' + esc(s.chipId) + '"') : button('知道了','close-sheet','btn full'));
     }
     return '<div class="overlay" data-action="overlay-close"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title">' + title + '</h2>' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭弹窗"') + '</div>' + content + '</section></div>';
+  }
+  function matchingCount(query) {
+    return '符合条件 ' + C.catalog(state,query).length + ' 款';
+  }
+  function filterDraft(form) {
+    const fields = new FormData(form);
+    return {search:filters.search,...Object.fromEntries(filterKeys.map(key=>[key,fields.get(key) || '']))};
+  }
+  function refreshFilterPreview(form) {
+    form.querySelector('#filter-preview').textContent = matchingCount(filterDraft(form));
   }
   function render(scrollTop = 0) {
     const functions = {catalog:catalogMarkup,favorites:favoritesMarkup,profile:profileMarkup,detail:detailMarkup,batch:batchMarkup,submit:editorMarkup,edit:editorMarkup,review:editorMarkup,history:historyMarkup,admin:adminMarkup};
@@ -358,8 +387,11 @@
     if (a === 'side') { side = el.dataset.side; return render(pageScroll()); }
     if (a === 'zoom') { sheet = {type:'zoom'}; return render(pageScroll()); }
     if (a === 'filters') { sheet = {type:'filters'}; return render(pageScroll()); }
-    if (a === 'clear-all') { filters = {search:'',tag:'',market:'',year:'',packagingForm:'',specification:'',series:'',releaseBatch:''}; return render(); }
-    if (a === 'reset-filters') { for (const select of el.form.querySelectorAll('select')) select.value = ''; return; }
+    if (a === 'clear-all') { filters = defaultFilters(); return render(); }
+    if (a === 'reset-filters') {
+      for (const select of el.form.querySelectorAll('select')) select.value = '';
+      return refreshFilterPreview(el.form);
+    }
     if (a === 'remove-filter' && filterKeys.includes(el.dataset.key)) { filters[el.dataset.key] = ''; return render(); }
     if (a === 'favorite-tab') { favoriteTab = el.dataset.tab; return render(); }
     if (a === 'favorite') {
@@ -418,7 +450,7 @@
   });
   root.addEventListener('submit', async event => {
     event.preventDefault(); if (busy) return;
-    if (event.target.id === 'filters-form') { const data = new FormData(event.target); for (const key of filterKeys) filters[key] = data.get(key); sheet = null; return render(); }
+    if (event.target.id === 'filters-form') { filters = filterDraft(event.target); sheet = null; return render(); }
     if (event.target.id !== 'editor-form') return;
     updateDraft(); const errorElement = document.getElementById('form-error'); errorElement.textContent = '';
     try {
@@ -464,6 +496,7 @@
   });
   root.addEventListener('change', async event => {
     const input = event.target;
+    if (input.form?.id === 'filters-form') return refreshFilterPreview(input.form);
     if (input.closest('#editor-form') && draft) { draft.modified = true; updateDraft(); }
     if (input.dataset.image && input.files?.[0]) {
       const currentDraft = draft, key = input.dataset.image;
@@ -495,6 +528,8 @@
       if (busy || epoch !== writeEpoch) { readQueued = true; return; }
       if (!latest) return;
       state = latest;
+      const filterForm = document.getElementById('filters-form');
+      if (filterForm) refreshFilterPreview(filterForm);
       if (draft || sheet) return;
       if (document.activeElement?.id === 'catalog-search') root.querySelector('#catalog-results').innerHTML = catalogResults();
       else render(pageScroll());

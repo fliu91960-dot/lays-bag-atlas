@@ -56,31 +56,17 @@
     });
   }
   async function initialize() {
+    shipped = C.initialState();
     try { await openStorage(); } catch (_) {
       // A visitor can still browse the shipped atlas when browser storage is disabled.
-      preview = C.initialState();
-      preview.favorites = [];
+      preview = {...shipped,favorites:[]};
       return preview;
     }
-    shipped = C.initialState();
-    let catalogue = C.catalog(shipped);
-    if (location.protocol !== 'file:') {
-      try {
-        const response = await fetch('./catalogue.json', {cache:'no-store'});
-        if (response.ok) {
-          const data = await response.json();
-          const expectedIds = new Set(catalogue.map(c=>c.id));
-          if (data.revision === shipped.fixtureRevision && Array.isArray(data.products) &&
-              data.products.length === expectedIds.size && data.products.every(c=>c.active === true && typeof c.isDemo === 'boolean' && Array.isArray(c.tags) && expectedIds.delete(c.id))) {
-            for (const card of data.products) C.cleanFields(card,true);
-            catalogue = data.products;
-          }
-        }
-      } catch (_) { /* Shipped catalogue remains available when the data file is unreachable. */ }
-    }
+    // The release builds both core.js and the public JSON export from this same fixture.
+    const catalogue = C.catalog(shipped);
+    const ids = new Set(catalogue.map(c=>c.id));
     return mutate(value => {
       if (value.fixtureRevision > shipped.fixtureRevision) return value;
-      const ids = new Set(catalogue.map(c=>c.id));
       const retired = value.chips.filter(c=>!ids.has(c.id));
       if (retired.every(c=>c.active === false && c.imagePending && c.coverImage === 'assets/unknown.png' && !c.backImage) &&
           JSON.stringify(C.catalog(value)) === JSON.stringify(catalogue)) return value;

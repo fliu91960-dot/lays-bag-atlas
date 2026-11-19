@@ -218,7 +218,12 @@
       return ' ';
     }).trim().split(/\s+/).filter(Boolean);
     if (f.specification) weights.push(f.specification);
+    const collection = f.collection
+      ? new Map(state.favorites.filter(entry=>entry.userId === state.currentUserId).map(entry=>[entry.chipId,entry.status]))
+      : null;
     return state.chips.filter(item => item.active !== false)
+      .filter(item => !collection || (f.collection === 'missing' ? collection.get(item.id) !== 'owned' : collection.get(item.id) === f.collection))
+      .filter(item => !f.imageStatus || (f.imageStatus === 'ready' ? hasFrontImage(item) : !hasFrontImage(item)))
       .filter(item => {
         if (!words.length) return true;
         const text = normalizeSearch([item.name, item.flavor, item.market, item.packagingForm, item.series, item.releaseBatch, ...item.tags].join(' '));

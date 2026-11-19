@@ -56,7 +56,8 @@ body { display: block; background: var(--bg); }
 #filters-form { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px 12px; }
 #filters-form .field { min-width: 0; margin: 0; }
 #filters-form select { width: 100%; min-width: 0; text-overflow: ellipsis; }
-#filters-form .field:last-of-type, #filters-form .action-row { grid-column: 1 / -1; }
+#filters-form .filter-wide, #filters-form .filter-actions { grid-column: 1 / -1; }
+.filter-actions output { display: block; margin: 0 0 8px; font-size: 13px; color: var(--muted); }
 @media (min-width: 700px) {
   body { padding: 0; }
   #app { width: 100%; max-width: 1160px; height: 100dvh; border: 0; border-radius: 0; box-shadow: none; }
