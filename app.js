@@ -468,7 +468,11 @@
       const chipId = route.id, selected = el.dataset.status;
       const previous = selected || C.favoriteStatus(state,chipId);
       const status = el.getAttribute('aria-pressed') === 'true' ? '' : selected;
-      return write(s => C.setFavorite(s,chipId,status,previous),'收藏已更新');
+      const originalLabel = el.innerHTML;
+      el.disabled = true;
+      el.textContent = '正在保存…';
+      try { return await write(s => C.setFavorite(s,chipId,status,previous),'收藏已更新'); }
+      finally { if (el.isConnected) { el.disabled = false; el.innerHTML = originalLabel; } }
     }
     if (a === 'contribute') { if (PUBLIC) return; return go('submit',{targetChipId:id}); }
     if (a === 'submit') { if (PUBLIC) return toast('分享版先开放浏览和收藏'); return go('submit'); }
@@ -481,7 +485,7 @@
     if (a === 'submission-detail') { sheet = {type:'submission',id}; return render(pageScroll()); }
     if (a === 'toggle-active') { const chip = state.chips.find(c => c.id === id); if (!chip.active) return write(s => C.setActive(s,id,true),'图鉴已重新上架'); sheet = {type:'active',id}; return render(pageScroll()); }
     if (a === 'confirm-active') { sheet = null; return write(s => C.setActive(s,id,false),'图鉴已下架，收藏记录保留'); }
-    if (a === 'stat') { favoriteTab = el.dataset.name; return go('favorites'); }
+    if (a === 'stat') { favoriteTab = el.dataset.name; favoriteSearch = ''; return go('favorites'); }
     if (a === 'about') { sheet = {type:a}; return render(pageScroll()); }
     if (a === 'choose-duplicate') {
       const chip = state.chips.find(card=>card.id === id && card.active !== false);
@@ -592,7 +596,7 @@
       else if (focusable.length && !event.shiftKey && index === focusable.length-1) { event.preventDefault(); focusable[0].focus(); }
     }
   });
-  window.addEventListener('beforeunload', event => { if (draft?.modified) { event.preventDefault(); event.returnValue = ''; } });
+  window.addEventListener('beforeunload', event => { if (busy || draft?.modified) { event.preventDefault(); event.returnValue = ''; } });
   let readQueued = false, reading = false, writeEpoch = 0;
   function queueExternalRead() { readQueued = true; refreshExternal(); }
   async function refreshExternal() {

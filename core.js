@@ -356,7 +356,7 @@
           const reviewed = cleanFields(opts.fields,true);
           if (opts.baseline) fields = reviewed;
           else {
-            const submitted = cleanFields(record,true);
+            const submitted = cleanFields(record,false);
             for (const key of Object.keys(reviewed)) {
               if (!sameField(key,reviewed[key],submitted[key])) fields[key] = reviewed[key];
             }
