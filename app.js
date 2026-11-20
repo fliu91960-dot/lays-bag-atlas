@@ -227,7 +227,7 @@
     const owned = new Set(C.favorites(state,'owned').map(chip=>chip.id));
     const count = cards.filter(chip=>owned.has(chip.id)).length;
     const visible = route.onlyMissing ? cards.filter(chip=>!owned.has(chip.id)) : cards;
-    const progress = cards.length ? '<p class="batch-progress">已拥有 <strong>' + count + '/' + cards.length + '</strong> 款 · 本图鉴收录 ' + cards.length + ' 款</p>' : '';
+    const progress = '<p class="batch-progress">已拥有 <strong>' + count + '/' + cards.length + '</strong> 款</p>';
     const share = PUBLIC && location.protocol !== 'file:' ? button('复制批次链接','share-batch','btn secondary') : '';
     const source = safeSource(batch.sourceUrl) ? '<p class="batch-source source-note"><a href="' + esc(batch.sourceUrl) + '" target="_blank" rel="noopener noreferrer">批次资料 ↗</a></p>' : '';
     return '<main class="page" data-screen-label="发行批次">' + header(batch.name,share) + '<div class="batch-controls">' + progress +
@@ -235,14 +235,23 @@
       (visible.length ? cardGrid(visible,false) : empty('已拥有本图鉴收录的全部款','')) + source + '</main>';
   }
   function batchDirectoryResults() {
-    const batches = C.releaseBatches(state,route.query);
-    if (!batches.length) return empty('没有匹配的发行批次','',button('清除批次搜索','clear-batch-search','btn secondary'));
-    const owned = new Set(C.favorites(state,'owned').map(chip=>chip.id));
-    return yearGroups(batches,'year-desc',group=>'<div class="batch-index">' + group.map(batch=>{
+    const progress = route.progress || '';
+    const batches = C.batchProgress(state,route.query);
+    const choices = [['started','收集中'],['complete','已集齐']]
+      .filter(([key])=>key === progress || batches.some(batch=>batch.progress === key));
+    const control = ([key,label])=>button(label,'batch-progress-filter','btn secondary',
+      'data-progress="' + key + '" aria-pressed="' + (progress === key) + '"');
+    const controls = choices.length ? '<div class="batch-controls batch-directory-controls">' +
+      [['','全部'],...choices].map(control).join('') + '</div>' : '';
+    const matching = progress ? batches.filter(batch=>batch.progress === progress) : batches;
+    if (!matching.length) return controls + empty(progress ? '该进度下没有匹配的批次' : '没有匹配的发行批次','',
+      progress ? control(['','查看全部进度']) : button('清除批次搜索','clear-batch-search','btn secondary'));
+    return controls + yearGroups(matching,'year-desc',group=>'<div class="batch-index">' + group.map(batch=>{
       const cover = batch.cards.find(C.hasFrontImage);
-      const progress = batch.cards.filter(chip=>owned.has(chip.id)).length + '/' + batch.cards.length + ' 款';
+      const label = batch.progress === 'complete' ? '已集齐 · ' + batch.cards.length + ' 款' :
+        '已拥有 ' + batch.owned + '/' + batch.cards.length + ' 款';
       const art = cover ? '<img src="' + esc(image(cover.coverImage)) + '" alt="" loading="lazy">' : '<span class="batch-cover-empty">' + icon('bag') + '</span>';
-      return button(art + '<span><strong>' + esc(batch.name) + '</strong><small>已拥有 ' + progress + '</small></span>' + icon('arrow'),
+      return button(art + '<span><strong>' + esc(batch.name) + '</strong><small>' + label + '</small></span>' + icon('arrow'),
         'open-batch','package-option batch-index-item','data-id="' + esc(batch.id) + '"');
     }).join('') + '</div>','批');
   }
@@ -510,6 +519,7 @@
       return;
     }
     if (a === 'batch-missing') { route.onlyMissing = !route.onlyMissing; return render(); }
+    if (a === 'batch-progress-filter') { route.progress = el.dataset.progress; return render(pageScroll()); }
     if (a === 'clear-batch-search' || a === 'clear-favorite-search') {
       const input = document.getElementById(a === 'clear-batch-search' ? 'batch-search' : 'favorite-search');
       input.value = '';

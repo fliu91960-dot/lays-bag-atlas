@@ -126,6 +126,7 @@ body { display: block; background: var(--bg); }
 .batch-controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; padding: 0 var(--gutter) 16px; }
 .batch-progress { font-size: 14px; }
 .batch-controls [aria-pressed="true"] { background: #fff1bd; border-color: #9b751d; }
+.batch-directory-controls { justify-content: flex-start; }
 .catalog-tools { display: flex; flex-wrap: wrap; gap: 2px 12px; justify-content: flex-end; }
 .catalog-tools .text-btn { min-height: 36px; }
 .section-results { margin-top: 16px; }

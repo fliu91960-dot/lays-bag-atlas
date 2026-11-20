@@ -308,6 +308,15 @@
     }
     return [...batches.values()].filter(batch=>batch.cards.some(matches)).sort((a,b)=>b.year-a.year);
   }
+  function batchProgress(state, query) {
+    const owned = new Set(state.favorites.filter(item=>item.userId === state.currentUserId && item.status === 'owned')
+      .map(item=>item.chipId));
+    return releaseBatches(state,query).map(batch=>{
+      const count = batch.cards.filter(card=>owned.has(card.id)).length;
+      const progress = count === batch.cards.length ? 'complete' : count ? 'started' : '';
+      return {...batch,owned:count,progress};
+    });
+  }
   function favoriteStatus(state, chipId) {
     const relation = state.favorites.find(item => item.userId === state.currentUserId && item.chipId === chipId);
     return relation ? relation.status : '';
@@ -326,9 +335,28 @@
     assert(state.chips.some(item => item.id === chipId && (!status || item.active !== false)), '这款图鉴已下架或不存在');
     const current = favoriteStatus(state, chipId);
     if (current === status || (!status && removeOnlyIf && current !== removeOnlyIf)) return state;
+    return replaceFavorites(state,new Set([chipId]),status);
+  }
+  function setFavoriteBatch(state, chipIds, previous, status) {
+    assert(['owned','wanted'].includes(previous) && ['', 'owned', 'wanted'].includes(status) && status !== previous,
+      '收藏状态不正确');
+    const ids = new Set(chipIds);
+    if (!ids.size) return state;
+    const favoritesById = new Map(state.favorites.filter(item=>item.userId === state.currentUserId)
+      .map(item=>[item.chipId,item.status]));
+    const cardsById = new Map(state.chips.map(card=>[card.id,card]));
+    for (const id of ids) {
+      assert(favoritesById.get(id) === previous, '部分收藏状态已变化，请重新选择');
+      const card = cardsById.get(id);
+      assert(card && (!status || card.active !== false), '已下架的包装只能移除收藏');
+    }
+    return replaceFavorites(state,ids,status);
+  }
+  function replaceFavorites(state, ids, status) {
     const next = clone(state);
-    next.favorites = next.favorites.filter(item => !(item.userId === next.currentUserId && item.chipId === chipId));
-    if (status) next.favorites.push({ userId: next.currentUserId, chipId, status, updateTime: now() });
+    next.favorites = next.favorites.filter(item => !(item.userId === next.currentUserId && ids.has(item.chipId)));
+    const updateTime = now();
+    if (status) for (const chipId of ids) next.favorites.push({userId:next.currentUserId,chipId,status,updateTime});
     return next;
   }
   const FIELD_NAMES = Object.freeze({name:'名称',market:'市场',year:'包装年份',packagingForm:'包装形态',
@@ -476,6 +504,6 @@
     for (const submission of value.submissions) { assert(submission && ['pending', 'approved', 'rejected'].includes(submission.status) && users.has(submission.userId) && typeof submission.id === 'string' && /^[a-zA-Z0-9_-]+$/.test(submission.id) && !submissionIds.has(submission.id), '备份投稿格式不正确'); cleanFields(submission, !submission.targetChipId); assert(submission.coverImage || submission.backImage, '投稿缺少图片'); assert(submission.status !== 'approved' || seen.has(submission.chipId), '备份投稿缺少已收录图鉴'); assert(!submission.chipId || seen.has(submission.chipId), '备份投稿关联不存在'); assert(typeof submission.reviewRemark === 'string' && submission.reviewRemark.length <= 300, '审核说明格式不正确'); submissionIds.add(submission.id); }
     return clone(value);
   }
-  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, filterValues, homeCatalog, packagingYearGroups, releaseBatches, relatedPackaging, resolvePublicChip, favorites, favoriteStatus, setFavorite,
+  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, filterValues, homeCatalog, packagingYearGroups, releaseBatches, batchProgress, relatedPackaging, resolvePublicChip, favorites, favoriteStatus, setFavorite, setFavoriteBatch,
     submit, ownSubmissions, reviewFields, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, hasFrontImage, validateState };
 });
