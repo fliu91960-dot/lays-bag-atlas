@@ -243,6 +243,23 @@
       .filter(item => !f.tag || (f.tag === '常规' ? item.tags.length === 0 :
         item.tags.includes(f.tag) || (f.tag === '限定' && item.tags.includes('城市限定'))));
   }
+  function filterValues(state, key, query, matches = catalog(state, query)) {
+    if (key === 'imageStatus' && !state.chips.some(card=>card.active !== false && !hasFrontImage(card))) return [];
+    const candidates = query[key] && key !== 'order' ? catalog(state,{...query,[key]:''}) : matches;
+    if (key === 'order') return new Set(candidates.map(card=>card.year)).size > 1 ? ['year-desc','year-asc'] : [];
+    if (key === 'specification') return [...new Set(candidates.flatMap(packageWeights))]
+      .sort((a,b)=>parseFloat(a)-parseFloat(b));
+    if (key === 'year') {
+      const years = [...new Set(candidates.map(card=>card.year))];
+      return years.filter(Boolean).sort((a,b)=>a-b).map(String).concat(years.includes(null) ? ['unknown'] : []);
+    }
+    const fixed = {tag:['常规',...TAGS],collection:['missing','owned','wanted'],imageStatus:['ready','pending']}[key];
+    if (fixed) {
+      const subset = {...state,chips:candidates};
+      return fixed.filter(value=>catalog(subset,{[key]:value}).length);
+    }
+    return [...new Set(candidates.map(card=>card[key]).filter(Boolean))];
+  }
   function relatedPackaging(state, id) {
     const group = ['official-cn-10','wasabi-jm'];
     return group.includes(id) ? catalog(state).filter(card=>card.id !== id && group.includes(card.id)) : [];
@@ -452,6 +469,6 @@
     for (const submission of value.submissions) { assert(submission && ['pending', 'approved', 'rejected'].includes(submission.status) && users.has(submission.userId) && typeof submission.id === 'string' && /^[a-zA-Z0-9_-]+$/.test(submission.id) && !submissionIds.has(submission.id), '备份投稿格式不正确'); cleanFields(submission, !submission.targetChipId); assert(submission.coverImage || submission.backImage, '投稿缺少图片'); assert(submission.status !== 'approved' || seen.has(submission.chipId), '备份投稿缺少已收录图鉴'); assert(!submission.chipId || seen.has(submission.chipId), '备份投稿关联不存在'); assert(typeof submission.reviewRemark === 'string' && submission.reviewRemark.length <= 300, '审核说明格式不正确'); submissionIds.add(submission.id); }
     return clone(value);
   }
-  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, homeCatalog, packagingYearGroups, releaseBatches, relatedPackaging, resolvePublicChip, favorites, favoriteStatus, setFavorite,
+  return { MARKETS, TAGS, FORMS, FOCUS_WEIGHTS, FIELD_NAMES, initialState, migrateState, bindIdentity, clone, user, packageWeights, catalog, filterValues, homeCatalog, packagingYearGroups, releaseBatches, relatedPackaging, resolvePublicChip, favorites, favoriteStatus, setFavorite,
     submit, ownSubmissions, reviewFields, review, saveChip, setActive, switchUser, setUserRole, cleanFields, validImage, hasFrontImage, validateState };
 });

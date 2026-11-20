@@ -436,32 +436,13 @@
   function hasPendingCovers() {
     return state.chips.some(card=>card.active !== false && !C.hasFrontImage(card));
   }
-  function availableFilterValues(key, draft, matches) {
-    if (key === 'imageStatus' && !hasPendingCovers()) return [];
-    const candidates = draft[key] ? C.catalog(state,{...draft,[key]:''}) : matches;
-    if (key === 'order') return new Set(candidates.map(card=>card.year)).size > 1
-      ? orderOptions.map(([value])=>value) : [];
-    if (key === 'specification') return [...new Set(candidates.flatMap(C.packageWeights))]
-      .sort((a,b)=>parseFloat(a)-parseFloat(b));
-    if (key === 'year') {
-      const years = [...new Set(candidates.map(card=>card.year))];
-      return years.filter(Boolean).sort((a,b)=>a-b).map(String).concat(years.includes(null) ? ['unknown'] : []);
-    }
-    const fixed = {tag:['常规',...C.TAGS],collection:collectionOptions.map(([value])=>value),
-      imageStatus:imageOptions.map(([value])=>value)}[key];
-    if (fixed) {
-      const subset = {...state,chips:candidates};
-      return fixed.filter(value=>C.catalog(subset,{[key]:value}).length);
-    }
-    return [...new Set(candidates.map(card=>card[key]).filter(Boolean))];
-  }
   function refreshFilterPreview(form, values = filterDraft(form)) {
     const matches = C.catalog(state,values);
     let visible = 0;
     for (const [key,,placeholder] of filterFields) {
       const select = form.elements.namedItem(key);
       const current = values[key] || '';
-      const available = availableFilterValues(key,values,matches);
+      const available = C.filterValues(state,key,values,matches);
       if (current && !available.includes(current)) available.push(current);
       select.innerHTML = option('',placeholder,current) +
         available.map(value=>option(value,filterLabel(key,value),current)).join('');
