@@ -32,7 +32,19 @@
   const collectionOptions = [['missing','未拥有'],['owned','已拥有'],['wanted','想要收藏']];
   const imageOptions = [['ready','已有封面'],['pending','封面待补']];
   const orderOptions = [['year-desc','包装年份从新到旧'],['year-asc','包装年份从旧到新']];
-  const filterKeys = ['market','year','series','packagingForm','specification','tag','releaseBatch','collection','imageStatus','order'];
+  const filterFields = [
+    ['market','地区','全部地区'],
+    ['year','包装年份','全部年份'],
+    ['series','产品系列','全部系列'],
+    ['packagingForm','包装形态','全部形态'],
+    ['specification','净含量（优先按图示）','全部规格'],
+    ['tag','款式','全部款式'],
+    ['collection','收藏状态','全部状态'],
+    ['imageStatus','展示图片','全部图片'],
+    ['order','浏览顺序','默认顺序'],
+    ['releaseBatch','发行批次','全部批次']
+  ];
+  const filterKeys = filterFields.map(([key]) => key);
   const defaultFilters = () => ({search:'', ...Object.fromEntries(filterKeys.map(key=>[key,'']))});
   let filters = defaultFilters(), favoriteTab = 'owned', favoriteSearch = '', adminTab = 'pending', historyTab = '';
   let side = 'coverImage', toastTimer;
@@ -359,24 +371,11 @@
     let content = '';
     if (sheet.type === 'share') content = '<label class="field"><span>选择并复制地址</span><input id="share-url" readonly value="' + esc(routeUrl(route,true)) + '"></label>';
     if (sheet.type === 'filters') {
-      const select = (key,label,values,all) => '<label class="field' + (key === 'releaseBatch' ? ' filter-wide' : '') + '"><span>' + label + '</span><select name="' + key + '">' + option('',all,filters[key] || '') + values.map(v => option(Array.isArray(v) ? v[0] : v,Array.isArray(v) ? v[1] : v,filters[key])).join('') + '</select></label>';
-      const active = C.homeCatalog(state);
-      const series = [...new Set(active.map(c => c.series).filter(Boolean))];
-      const weights = [...new Set(active.flatMap(C.packageWeights))].sort((a,b) => parseFloat(a)-parseFloat(b));
-      const years = [...new Set(active.map(c => c.year).filter(Boolean))].sort((a,b) => a-b);
-      const batches = [...new Set(active.map(c => c.releaseBatch).filter(Boolean))];
       content = '<form id="filters-form"><div class="filter-fields">' +
-        select('market','地区',[...new Set(active.map(c => c.market))],'全部地区') +
-        select('year','包装年份',[...years,['unknown','待核实']],'全部年份') +
-        select('series','产品系列',series,'全部系列') +
-        select('packagingForm','包装形态',[...new Set(active.map(c => c.packagingForm))],'全部形态') +
-        select('specification','净含量（优先按图示）',weights,'全部规格') +
-        select('tag','款式',['常规',...C.TAGS],'全部款式') +
-        select('collection','收藏状态',collectionOptions,'全部状态') +
-        select('imageStatus','展示图片',imageOptions,'全部图片') +
-        select('order','浏览顺序',orderOptions,'默认顺序') +
-        select('releaseBatch','发行批次',batches,'全部批次') +
-        '</div><div class="filter-actions"><output id="filter-preview" aria-live="polite">' + matchingCount(filters) + '</output><div class="action-row">' +
+        filterFields.map(([key,label]) => '<label class="field' + (key === 'releaseBatch' ? ' filter-wide' : '') +
+          '"><span>' + label + '</span><select name="' + key + '"></select></label>').join('') +
+        '<p class="filter-empty muted" hidden>当前搜索没有可用筛选。</p>' +
+        '</div><div class="filter-actions"><output id="filter-preview" aria-live="polite"></output><div class="action-row">' +
         button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></div></form>';
     }
     if (sheet.type === 'about') content = '<p>图鉴当前收录 ' + C.catalog(state).length + ' 条产品记录，包含不同市场、系列及包装形态。筛选支持年份、系列、袋装／罐装与净含量。详情保留素材来源。</p><p>收藏中预放了一组展示记录，可自行调整。图片和操作保存在当前浏览器。</p>' + button('知道了','close-sheet','btn full');
@@ -388,21 +387,55 @@
     }
     return '<div class="overlay" data-action="overlay-close"><section class="sheet' + (sheet.type === 'filters' ? ' filter-sheet' : '') + '" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title">' + title + '</h2>' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭弹窗"') + '</div>' + content + '</section></div>';
   }
-  function matchingCount(query) {
-    return '符合条件 ' + C.catalog(state,query).length + ' 款';
-  }
   function filterDraft(form) {
     const fields = new FormData(form);
     return {search:filters.search,...Object.fromEntries(filterKeys.map(key=>[key,fields.get(key) || '']))};
   }
-  function refreshFilterPreview(form) {
-    form.querySelector('#filter-preview').textContent = matchingCount(filterDraft(form));
+  function availableFilterValues(key, draft, matches) {
+    const candidates = draft[key] ? C.catalog(state,{...draft,[key]:''}) : matches;
+    if (key === 'order') return new Set(candidates.map(card=>card.year)).size > 1
+      ? orderOptions.map(([value])=>value) : [];
+    if (key === 'specification') return [...new Set(candidates.flatMap(C.packageWeights))]
+      .sort((a,b)=>parseFloat(a)-parseFloat(b));
+    if (key === 'year') {
+      const years = [...new Set(candidates.map(card=>card.year))];
+      return years.filter(Boolean).sort((a,b)=>a-b).map(String).concat(years.includes(null) ? ['unknown'] : []);
+    }
+    const fixed = {tag:['常规',...C.TAGS],collection:collectionOptions.map(([value])=>value),
+      imageStatus:imageOptions.map(([value])=>value)}[key];
+    if (fixed) {
+      const subset = {...state,chips:candidates};
+      return fixed.filter(value=>C.catalog(subset,{[key]:value}).length);
+    }
+    return [...new Set(candidates.map(card=>card[key]).filter(Boolean))];
+  }
+  function refreshFilterPreview(form, values = filterDraft(form)) {
+    const matches = C.catalog(state,values);
+    let visible = 0;
+    for (const [key,,placeholder] of filterFields) {
+      const select = form.elements.namedItem(key);
+      const current = values[key] || '';
+      const available = availableFilterValues(key,values,matches);
+      if (current && !available.includes(current)) available.push(current);
+      select.innerHTML = option('',placeholder,current) +
+        available.map(value=>option(value,filterLabel(key,value),current)).join('');
+      select.parentElement.hidden = !available.length;
+      if (available.length) visible++;
+    }
+    form.querySelector('.filter-empty').hidden = visible > 0;
+    form.querySelector('#filter-preview').textContent = '符合条件 ' + matches.length + ' 款';
   }
   function render(scrollTop = 0) {
     const functions = {catalog:catalogMarkup,favorites:favoritesMarkup,profile:profileMarkup,detail:detailMarkup,batch:batchMarkup,directory:batchDirectoryMarkup,submit:editorMarkup,edit:editorMarkup,review:editorMarkup,history:historyMarkup,admin:adminMarkup};
     root.innerHTML = (functions[route.name] || catalogMarkup)() + sheetMarkup();
     const page = root.querySelector('.page'); if (page) { page.scrollTop = scrollTop; if (sheet) page.setAttribute('inert',''); }
-    if (sheet) { root.querySelector('.bottom-nav')?.setAttribute('inert',''); root.querySelector('.sticky-actions')?.setAttribute('inert',''); root.querySelector('.sheet-close')?.focus({preventScroll:true}); }
+    if (sheet) {
+      root.querySelector('.bottom-nav')?.setAttribute('inert','');
+      root.querySelector('.sticky-actions')?.setAttribute('inert','');
+      const form = root.querySelector('#filters-form');
+      if (form) refreshFilterPreview(form,filters);
+      root.querySelector('.sheet-close')?.focus({preventScroll:true});
+    }
     document.title = (route.name === 'detail' ? state.chips.find(c => c.id === route.id)?.name : root.querySelector('main h1,main h2')?.textContent) || '乐事薯片袋图鉴';
   }
   async function write(transform, message, redraw = true) {
@@ -598,7 +631,7 @@
   root.addEventListener('keydown', event => {
     if (event.key === 'Escape' && sheet) { sheet = null; render(pageScroll()); }
     if (event.key === 'Tab' && sheet) {
-      const focusable = [...root.querySelectorAll('[role="dialog"] button,[role="dialog"] select,[role="dialog"] input')].filter(e => !e.disabled);
+      const focusable = [...root.querySelectorAll('[role="dialog"] button,[role="dialog"] select,[role="dialog"] input')].filter(e => !e.disabled && !e.closest('[hidden]'));
       const index = focusable.indexOf(document.activeElement);
       if (focusable.length && event.shiftKey && index <= 0) { event.preventDefault(); focusable[focusable.length-1].focus(); }
       else if (focusable.length && !event.shiftKey && index === focusable.length-1) { event.preventDefault(); focusable[0].focus(); }
