@@ -25,6 +25,8 @@
     const src = C.validImage(value) ? value : 'assets/unknown.png';
     return window.AtlasImages?.[src] || src;
   };
+  const thumbnails = JSON.parse(document.querySelector('meta[name="atlas-thumbnails"]')?.content || '{}');
+  const photoRetries = new Map();
   const safeSource = value => { try { const u = new URL(value); return u.protocol === 'https:' && ['www.lays.com.cn','www.pepsico.com.cn','m.thepaper.cn','www.dealmoon.com','marketfoodasia.com','tao.hooos.com','www.foodaily.com','foodaily.com','post.smzdm.com','k.sina.cn','k.sina.com.cn','www.sohu.com','www.sayweee.com','wiki.smzdm.com','ma.gfsuper.com','www.digitaling.com','socialbeta.com','mightydepot.com','www.topfoo.com','www.ganhuoku.cn','www.foodtalks.cn','www.tentopsnacks.com','exoticers.com','americanuncleshop.fr','exosweet.com','www.foodinc.com.cn','www.smzdm.com','www.xinyingyang.com','candyfunhouse.com','shopee.ph','www.alibaba.com','www.umall.com.au','www.charmfoods.com.tw','www.yami.com','xinwen.bjd.com.cn','24h.pchome.com.tw','afamily.vn','shop.tiktok.com','laysaroundtheworld.com','shopee.tw','ufood.com.hk','beautycornerca.com','biggo.com.tw','online.citysuper.com.hk','style.udn.com','www.cosmopolitan.com','www.weee.com','www.wellcome.com.hk','fuji-san.ru','eg.alpremium.ca','exoticsnacks.com','online.carrefour.com.tw','tw.buy.yahoo.com','www.rakuten.com.tw','www.snaxo.ca','eorder.soda-mall.com','exoticsnackguysonline.com','munchaddict.com','shop.app','www.hktvmall.com','www.mintel.com','www.sina.cn','www.scrummy.pl','kimchi.pl','eg1717.pixnet.net','j-k-house.myshopify.com','www.fairprice.com.sg','ezbuyco.com','shop.pxgo.com.tw','choco-yummy.com.ua','rozetka.com.ua','www.exodrinks.fr','www.waitrose.ae','sugarrushshop.co.uk','www.pns.hk','www.home-snack.com','www.sinosplice.com','ep.shxwcb.com','www.noveltybee-store.com','onelife.tw','m.bjnews.com.cn','pangjing.cn','www.4anet.com','www.cbndata.com','static.zhoudaosh.com','www.foodszs.com','www.mobilewiz.com.tw','news.sina.com.cn','www.dadamokujin.com','beautycornerca.com','www.yilantop.com','www.pinterest.com'].includes(u.hostname) && !u.username && !u.password; } catch (_) { return false; } };
   const date = value => { const d = new Date(value); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('zh-CN'); };
   const statusName = { pending:'待审核', approved:'已收录', rejected:'未通过' };
@@ -74,9 +76,11 @@
   }
   function card(item, showBatch, eager) {
     const status = C.favoriteStatus(state, item.id);
+    const thumbnail = thumbnails[item.coverImage];
     const cover = item.imagePending
       ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>'
-      : '<img loading="' + (eager ? 'eager' : 'lazy') + '" decoding="async" src="' +
+      : '<img data-packaging-photo loading="' + (eager ? 'eager' : 'lazy') + '" decoding="async"' +
+        (thumbnail ? ' srcset="' + esc(thumbnail) + ' 1x"' : '') + ' src="' +
         esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">';
     return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + cover + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(C.packageWeights(item).join(' / ') || '规格待核实') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + tags(item,true,showBatch) + '</div></button>';
   }
@@ -160,11 +164,7 @@
     const status = C.favoriteStatus(state,chip.id);
     const edit = !PUBLIC && C.user(state).role !== 'user' ? button(icon('edit'),'edit','back','aria-label="编辑图鉴" data-id="' + esc(chip.id) + '"')
       : PUBLIC && chip.active !== false && location.protocol !== 'file:' ? button('复制单品链接','share-chip','btn secondary') : '';
-    const pending = side === 'coverImage' && chip.imagePending;
-    const picture = pending ? '<div class="image-pending">' + icon('bag') + '<span>正面图片待补</span></div>'
-      : button('<img src="' + esc(image(chip[side] || chip.coverImage)) + '" alt="' + esc(chip.name) +
-        (side === 'backImage' ? '背面' : '正面') + '"><span class="zoom">' + icon('zoom') + '</span>',
-        'zoom','zoom-target','aria-label="放大包装图片"');
+    const picture = detailPicture(chip);
     const switcher = chip.backImage ? '<div class="image-switch">' + [['coverImage','正面'],['backImage','背面']].map(([key,title]) => button(title,'side',side === key ? 'active' : '', 'data-side="' + key + '" aria-pressed="' + (side === key) + '"')).join('') + '</div>' : '';
     const seen = chip.firstSeenYear || chip.flavorDocumentedYear;
     const facts = [['发行市场',chip.market],['包装年份',chip.year ? chip.year + '年' : '待核实'],['包装形态',chip.packagingForm]];
@@ -186,6 +186,33 @@
         + button(icon('heart') + (status === 'wanted' ? '已标记想要' : '想要收藏'),'favorite','btn ' + (status === 'wanted' ? 'on-wanted' : ''),'data-status="wanted" aria-pressed="' + (status === 'wanted') + '"');
     return '<main class="page" data-screen-label="图鉴详情">' + header('图鉴详情',edit) + '<div class="detail-layout"><div><div class="detail-hero">' + picture + '</div>' + switcher + '</div><article class="detail-info"><h1>' + esc(chip.name) + '</h1><div class="tag-row">' + tags(chip) + (chip.active === false ? '<span class="tag">已下架</span>' : '') + '</div>' + batchLink + '<dl class="detail-fields">' + rows + '</dl>' + related + (chip.description ? '<p class="description">' + esc(chip.description) + '</p>' : '') + imageSource + historyMarkupFor(chip) + contribute + '</article></div></main><div class="sticky-actions"><div class="action-row">' + actions + '</div></div>';
   }
+  function detailPicture(chip, retry = false) {
+    if (side === 'coverImage' && chip.imagePending)
+      return '<div class="image-pending">' + icon('bag') + '<span>正面图片待补</span></div>';
+    const src = image(chip[side] || chip.coverImage);
+    if (retry && src.startsWith('assets/')) photoRetries.set(src,src + '?retry=' + Date.now());
+    return button('<img data-packaging-photo src="' + esc(photoRetries.get(src) || src) + '" alt="' + esc(chip.name) +
+      (side === 'backImage' ? '背面' : '正面') + '"><span class="zoom">' + icon('zoom') + '</span>',
+      'zoom','zoom-target','aria-label="放大包装图片"');
+  }
+  function photoUnavailable(retry = false) {
+    return '<div class="photo-unavailable">' + icon('image') + '<span>图片暂未加载</span>' +
+      (retry ? button('重新加载图片','retry-picture','btn secondary') : '') + '</div>';
+  }
+  root.addEventListener('error', event => {
+    const photo = event.target;
+    if (!photo.matches?.('img[data-packaging-photo]')) return;
+    if (photo.hasAttribute('srcset')) {
+      photo.removeAttribute('srcset');
+      return;
+    }
+    const hero = photo.closest('.detail-hero');
+    if (hero) {
+      const focused = hero.contains(document.activeElement);
+      hero.innerHTML = photoUnavailable(true);
+      if (focused) hero.querySelector('button').focus({preventScroll:true});
+    } else photo.outerHTML = photoUnavailable();
+  }, true);
   function packageOption(chip, action, selected = false) {
     const specs = [chip.market,chip.packagingForm,chip.series,C.packageWeights(chip).join(' / ')].filter(Boolean);
     if (chip.year) specs.push(chip.year + '年');
@@ -344,6 +371,7 @@
   }
   function restoreNavigation(saved) {
     ({route,trail,filters,favoriteTab,favoriteSearch = ''} = saved);
+    if (filters.imageStatus && !hasPendingCovers()) filters = {...filters,imageStatus:''};
     sheet = null; side = 'coverImage';
     render(saved.scrollTop);
   }
@@ -373,7 +401,11 @@
     if (!sheet) return '';
     if (sheet.type === 'zoom') {
       const chip = state.chips.find(c => c.id === route.id);
-      return '<div class="viewer" role="dialog" aria-modal="true" aria-label="包装大图" data-action="overlay-close">' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭大图"') + '<img src="' + esc(image(chip?.[side] || chip?.coverImage)) + '" alt="包装大图"><p>' + esc(chip?.name || '') + '</p></div>';
+      const src = image(chip?.[side] || chip?.coverImage);
+      return '<div class="viewer" role="dialog" aria-modal="true" aria-label="包装大图" data-action="overlay-close">' +
+        button(icon('close'),'close-sheet','sheet-close','aria-label="关闭大图"') +
+        '<img data-packaging-photo src="' + esc(photoRetries.get(src) || src) + '" alt="包装大图"><p>' +
+        esc(chip?.name || '') + '</p></div>';
     }
     const title = {filters:'筛选图鉴',about:'关于图鉴',discard:'放弃这次修改？',active:'下架这款图鉴？',submission:'投稿详情',share:route.name === 'batch' ? '批次链接' : '单品链接'}[sheet.type] || '';
     let content = '';
@@ -401,7 +433,11 @@
     const fields = new FormData(form);
     return {search:filters.search,...Object.fromEntries(filterKeys.map(key=>[key,fields.get(key) || '']))};
   }
+  function hasPendingCovers() {
+    return state.chips.some(card=>card.active !== false && !C.hasFrontImage(card));
+  }
   function availableFilterValues(key, draft, matches) {
+    if (key === 'imageStatus' && !hasPendingCovers()) return [];
     const candidates = draft[key] ? C.catalog(state,{...draft,[key]:''}) : matches;
     if (key === 'order') return new Set(candidates.map(card=>card.year)).size > 1
       ? orderOptions.map(([value])=>value) : [];
@@ -449,10 +485,10 @@
     document.title = (route.name === 'detail' ? state.chips.find(c => c.id === route.id)?.name : root.querySelector('main h1,main h2')?.textContent) || '乐事薯片袋图鉴';
   }
   function closeSheet() {
-    const wasZoomed = sheet?.type === 'zoom';
+    const opener = {zoom:'zoom',filters:'filters',about:'about',share:route.name === 'batch' ? 'share-batch' : 'share-chip'}[sheet?.type];
     sheet = null;
     render(pageScroll());
-    if (wasZoomed) root.querySelector('.zoom-target')?.focus({preventScroll:true});
+    if (opener) root.querySelector('[data-action="'+opener+'"]')?.focus({preventScroll:true});
   }
   async function write(transform, message, redraw = true) {
     if (busy) return false;
@@ -512,6 +548,15 @@
     }
     if (a === 'side') { side = el.dataset.side; return render(pageScroll()); }
     if (a === 'zoom') { sheet = {type:'zoom'}; return render(pageScroll()); }
+    if (a === 'retry-picture') {
+      const hero = el.closest('.detail-hero');
+      const chip = state.chips.find(c=>c.id === route.id);
+      if (hero && chip) {
+        hero.innerHTML = detailPicture(chip,true);
+        hero.querySelector('button')?.focus({preventScroll:true});
+      }
+      return;
+    }
     if (a === 'filters') { sheet = {type:'filters'}; return render(pageScroll()); }
     if (a === 'clear-all') { filters = defaultFilters(); return render(); }
     if (a === 'clear-filters') { filters = {...defaultFilters(),search:filters.search}; return render(); }

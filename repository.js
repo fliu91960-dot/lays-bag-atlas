@@ -51,6 +51,7 @@
     await new Promise((resolve,reject) => {
       const request = indexedDB.open('chips-atlas-public-v1',1);
       request.onupgradeneeded = () => request.result.createObjectStore('state');
+      request.onblocked = () => reject(new Error('浏览器暂时无法打开收藏存储'));
       request.onsuccess = () => { database = request.result; database.onversionchange = () => database.close(); resolve(); };
       request.onerror = () => reject(new Error('请允许浏览器保存收藏数据后重试'));
     });
@@ -65,14 +66,19 @@
     // The release builds both core.js and the public JSON export from this same fixture.
     const catalogue = C.catalog(shipped);
     const ids = new Set(catalogue.map(c=>c.id));
-    return mutate(value => {
+    try { return await mutate(value => {
       if (value.fixtureRevision > shipped.fixtureRevision) return value;
       const retired = value.chips.filter(c=>!ids.has(c.id));
       if (retired.every(c=>c.active === false && c.imagePending && c.coverImage === 'assets/unknown.png' && !c.backImage) &&
           JSON.stringify(C.catalog(value)) === JSON.stringify(catalogue)) return value;
       const archived = retired.map(c=>({...c,active:false,imagePending:true,coverImage:'assets/unknown.png',backImage:''}));
       return C.validateState({...value,chips:catalogue.concat(archived)});
-    });
+    }); } catch (_) {
+      // A full or unavailable database can reject writes even after opening successfully.
+      try { preview = await read(); }
+      catch (_) { preview = {...shipped,favorites:[]}; }
+      return preview;
+    }
   }
   window.AtlasRepository = {publicMode:true,get readOnly(){return Boolean(preview);},initialize,read,mutate,onExternalChange:callback => { if (updates) updates.onmessage = callback; }};
 })();
