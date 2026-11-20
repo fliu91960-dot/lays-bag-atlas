@@ -46,6 +46,17 @@ body { display: block; background: var(--bg); }
 .chip-year { margin-top: 2px; }
 .chip-card .tag-row { flex-wrap: wrap; margin: 6px 0 0; }
 .chip-card .edition { font-size: 11px; }
+@supports (grid-template-rows: subgrid) {
+  .grid { row-gap: 0; }
+  .chip-card {
+    display: grid;
+    grid-row: span 5;
+    grid-template-rows: subgrid;
+    align-self: stretch;
+    margin-block-end: 22px;
+  }
+  .chip-card > * { align-self: start; }
+}
 .filter-summary button { font-size: 12px; border-radius: 16px; padding: 6px 10px; background: #f5e9c2; color: #614d25; }
 .detail-info { padding-top: 20px; }
 .detail-info h1 { line-height: 1.4; overflow-wrap: anywhere; }

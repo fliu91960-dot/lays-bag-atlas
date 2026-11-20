@@ -25,7 +25,7 @@
     const src = C.validImage(value) ? value : 'assets/unknown.png';
     return window.AtlasImages?.[src] || src;
   };
-  const safeSource = value => { try { const u = new URL(value); return u.protocol === 'https:' && ['www.lays.com.cn','www.pepsico.com.cn','m.thepaper.cn','www.dealmoon.com','marketfoodasia.com','tao.hooos.com','www.foodaily.com','foodaily.com','post.smzdm.com','k.sina.cn','k.sina.com.cn','www.sohu.com','www.sayweee.com','wiki.smzdm.com','ma.gfsuper.com','www.digitaling.com','socialbeta.com','mightydepot.com','www.topfoo.com','www.ganhuoku.cn','www.foodtalks.cn','www.tentopsnacks.com','exoticers.com','americanuncleshop.fr','exosweet.com','www.foodinc.com.cn','www.smzdm.com','www.xinyingyang.com','candyfunhouse.com','shopee.ph','www.alibaba.com','www.umall.com.au','www.charmfoods.com.tw','www.yami.com','xinwen.bjd.com.cn','24h.pchome.com.tw','afamily.vn','shop.tiktok.com','laysaroundtheworld.com','shopee.tw','ufood.com.hk','beautycornerca.com','biggo.com.tw','online.citysuper.com.hk','style.udn.com','www.cosmopolitan.com','www.weee.com','www.wellcome.com.hk','fuji-san.ru','eg.alpremium.ca','exoticsnacks.com','online.carrefour.com.tw','tw.buy.yahoo.com','www.rakuten.com.tw','www.snaxo.ca','eorder.soda-mall.com','exoticsnackguysonline.com','munchaddict.com','shop.app','www.hktvmall.com','www.mintel.com','www.sina.cn','www.scrummy.pl','kimchi.pl','choco-yummy.com.ua','rozetka.com.ua','www.exodrinks.fr','www.waitrose.ae','sugarrushshop.co.uk','www.pns.hk','www.home-snack.com','www.sinosplice.com','ep.shxwcb.com','www.noveltybee-store.com','onelife.tw','m.bjnews.com.cn','pangjing.cn','www.4anet.com','www.cbndata.com','static.zhoudaosh.com','www.foodszs.com','www.mobilewiz.com.tw','news.sina.com.cn','www.dadamokujin.com','beautycornerca.com','www.yilantop.com','www.pinterest.com'].includes(u.hostname) && !u.username && !u.password; } catch (_) { return false; } };
+  const safeSource = value => { try { const u = new URL(value); return u.protocol === 'https:' && ['www.lays.com.cn','www.pepsico.com.cn','m.thepaper.cn','www.dealmoon.com','marketfoodasia.com','tao.hooos.com','www.foodaily.com','foodaily.com','post.smzdm.com','k.sina.cn','k.sina.com.cn','www.sohu.com','www.sayweee.com','wiki.smzdm.com','ma.gfsuper.com','www.digitaling.com','socialbeta.com','mightydepot.com','www.topfoo.com','www.ganhuoku.cn','www.foodtalks.cn','www.tentopsnacks.com','exoticers.com','americanuncleshop.fr','exosweet.com','www.foodinc.com.cn','www.smzdm.com','www.xinyingyang.com','candyfunhouse.com','shopee.ph','www.alibaba.com','www.umall.com.au','www.charmfoods.com.tw','www.yami.com','xinwen.bjd.com.cn','24h.pchome.com.tw','afamily.vn','shop.tiktok.com','laysaroundtheworld.com','shopee.tw','ufood.com.hk','beautycornerca.com','biggo.com.tw','online.citysuper.com.hk','style.udn.com','www.cosmopolitan.com','www.weee.com','www.wellcome.com.hk','fuji-san.ru','eg.alpremium.ca','exoticsnacks.com','online.carrefour.com.tw','tw.buy.yahoo.com','www.rakuten.com.tw','www.snaxo.ca','eorder.soda-mall.com','exoticsnackguysonline.com','munchaddict.com','shop.app','www.hktvmall.com','www.mintel.com','www.sina.cn','www.scrummy.pl','kimchi.pl','eg1717.pixnet.net','j-k-house.myshopify.com','www.fairprice.com.sg','ezbuyco.com','shop.pxgo.com.tw','choco-yummy.com.ua','rozetka.com.ua','www.exodrinks.fr','www.waitrose.ae','sugarrushshop.co.uk','www.pns.hk','www.home-snack.com','www.sinosplice.com','ep.shxwcb.com','www.noveltybee-store.com','onelife.tw','m.bjnews.com.cn','pangjing.cn','www.4anet.com','www.cbndata.com','static.zhoudaosh.com','www.foodszs.com','www.mobilewiz.com.tw','news.sina.com.cn','www.dadamokujin.com','beautycornerca.com','www.yilantop.com','www.pinterest.com'].includes(u.hostname) && !u.username && !u.password; } catch (_) { return false; } };
   const date = value => { const d = new Date(value); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('zh-CN'); };
   const statusName = { pending:'待审核', approved:'已收录', rejected:'未通过' };
   let state, route = { name:'catalog' }, trail = [], sheet = null, draft = null, busy = false;
@@ -60,16 +60,22 @@
     const year = item.firstSeenYear || item.flavorDocumentedYear;
     return year ? '口味首见：' + year + '年' + (item.firstSeenProvisional ? '（待核）' : '') : '年份待核实';
   }
-  function card(item, showBatch) {
+  function card(item, showBatch, eager) {
     const status = C.favoriteStatus(state, item.id);
-    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + (item.imagePending ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>' : '<img loading="lazy" src="' + esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">') + '' + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(C.packageWeights(item).join(' / ') || '规格待核实') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + tags(item,true,showBatch) + '</div></button>';
+    const cover = item.imagePending
+      ? '<div class="image-pending">' + icon('bag') + '<span>图片待补</span></div>'
+      : '<img loading="' + (eager ? 'eager' : 'lazy') + '" decoding="async" src="' +
+        esc(image(item.coverImage)) + '" alt="' + esc(item.name) + '正面">';
+    return '<button type="button" class="chip-card" data-action="detail" data-id="' + esc(item.id) + '" aria-label="查看' + esc(item.name) + '"><div class="chip-art ' + (item.sourceKind === 'official' ? 'official' : !item.isDemo ? 'uploaded' : '') + '">' + cover + (status ? '<span class="owned-badge ' + status + '">' + icon(status === 'owned' ? 'check' : 'heart') + (status === 'owned' ? '已拥有' : '想要') + '</span>' : '') + (item.active === false ? '<span class="owned-badge">已下架</span>' : '') + '</div><h3>' + esc(item.name) + '</h3><div class="chip-meta"><span>' + esc(C.packageWeights(item).join(' / ') || '规格待核实') + '</span>' + '<span>·</span><span>' + esc(item.market) + '</span></div><p class="chip-year">' + esc(yearLabel(item)) + '</p><div class="tag-row">' + tags(item,true,showBatch) + '</div></button>';
   }
   function filterLabel(key, value) {
     if (key === 'year' && value === 'unknown') return '包装年份待核实';
     const options = {collection:collectionOptions,imageStatus:imageOptions,order:orderOptions}[key];
     return options?.find(([id])=>id === value)?.[1] || value;
   }
-  function cardGrid(items, showBatch = true) { return '<div class="grid">' + items.map(item=>card(item,showBatch)).join('') + '</div>'; }
+  function cardGrid(items, showBatch = true, eagerCount = 0) {
+    return '<div class="grid">' + items.map((item, index) => card(item, showBatch, index < eagerCount)).join('') + '</div>';
+  }
   function yearGroups(items, order, markup, unit = '款') {
     return C.packagingYearGroups(items,order).map(([year,group]) =>
       '<section class="year-group" data-year="' + (year || 'unknown') + '"><h2><span>' +
@@ -84,14 +90,14 @@
     }).join('');
     const actions = button('发行批次 ' + icon('arrow'),'batch-directory','text-btn') + (!PUBLIC ? button(icon('plus') + '补充图鉴','submit','text-btn') : '');
     const heading = '<div class="catalog-heading"><strong>' + (selected.some(key=>key !== 'order') || filters.search ? '筛选结果' : '全部图鉴') + ' <span class="muted">' + items.length + '</span></strong><div class="catalog-tools">' + actions + '</div></div>';
-    const results = items.length ? (filters.order ? yearGroups(items,filters.order,cardGrid) : cardGrid(items)) :
+    const results = items.length ? (filters.order ? yearGroups(items,filters.order,cardGrid) : cardGrid(items,true,5)) :
       empty('没有找到这款包装','试试其他口味，或清除筛选条件。',button('查看全部图鉴','clear-all','btn secondary'));
     return (summary ? '<div class="filter-summary">' + summary + '</div>' : '') + heading + results;
   }
   function catalogMarkup() {
     const count = filterKeys.filter(key => filters[key]).length;
     const filter = button(icon('filter') + '筛选' + (count ? '<span class="filter-count">' + count + '</span>' : ''), 'filters', 'filter-trigger' + (count ? ' selected' : ''), 'aria-label="筛选图鉴"');
-    return '<main class="page" data-screen-label="图鉴"><header class="topbar"><div class="brand"><div class="brand-icon">' + icon('bag') + '</div><h1>乐事薯片袋图鉴</h1></div></header><div class="search-row"><label class="search">' + icon('search') + '<input id="catalog-search" type="search" maxlength="60" placeholder="搜索名称、口味或系列" aria-label="搜索包装名称、口味或系列" value="' + esc(filters.search) + '"></label>' + filter + '</div><div id="catalog-results">' + catalogResults() + '</div></main>' + navigation();
+    return '<main class="page" data-screen-label="图鉴"><header class="topbar"><div class="brand"><div class="brand-icon">' + icon('bag') + '</div><h1>乐事薯片袋图鉴</h1></div></header><div class="search-row"><label class="search">' + icon('search') + '<input id="catalog-search" type="search" maxlength="60" placeholder="搜名称、口味、系列" aria-label="搜索包装名称、口味或系列" value="' + esc(filters.search) + '"></label>' + filter + '</div><div id="catalog-results">' + catalogResults() + '</div></main>' + navigation();
   }
   function searchBox(id,label,placeholder,value) {
     return '<div class="search-row"><label class="search">' + icon('search') + '<input id="' + id + '" type="search" maxlength="60" aria-label="' + label + '" placeholder="' +
