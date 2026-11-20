@@ -209,14 +209,19 @@
     return String(value ?? '').normalize('NFKC').toLowerCase()
       .replace(/泡泡瑪特/g,'泡泡玛特').replace(/臺灣|台灣|臺湾/g,'台湾').replace(/香港特別行政區/g,'香港');
   }
-  function searchFilter(query, specification) {
+  function searchFilter(query, specification, batchOnly = false) {
     const weights = [];
-    const words = normalizeSearch(query).replace(/(?<![\d.])(\d+(?:\.\d+)?)\s*(?:g\b|克)/g, (_, grams) => {
+    const years = [];
+    const words = normalizeSearch(query).replace(/[、,/]/g,' ').replace(/(?<!\d)(\d{4})\s*年/g, (_, year) => {
+      years.push(Number(year));
+      return ' ';
+    }).replace(/(?<![\d.])(\d+(?:\.\d+)?)\s*(?:g\b|克)/g, (_, grams) => {
       weights.push(Number(grams) + 'g');
       return ' ';
     }).trim().split(/\s+/).filter(Boolean);
     if (specification) weights.push(specification);
     return item => {
+      if (years.length && !years.every(year=>year === item.releaseBatchYear || (!batchOnly && year === item.year))) return false;
       if (weights.length) {
         const available = packageWeights(item);
         if (!weights.every(weight=>available.includes(weight))) return false;
@@ -261,8 +266,10 @@
     return [...new Set(candidates.map(card=>card[key]).filter(Boolean))];
   }
   function relatedPackaging(state, id) {
-    const group = ['official-cn-10','wasabi-jm'];
-    return group.includes(id) ? catalog(state).filter(card=>card.id !== id && group.includes(card.id)) : [];
+    const current = resolvePublicChip(state,id);
+    const flavor = normalizeSearch(current?.flavor).trim();
+    return flavor ? state.chips.filter(card=>card.active !== false && card.id !== current.id &&
+      normalizeSearch(card.flavor).trim() === flavor) : [];
   }
   function resolvePublicChip(state, id) {
     const target = MERGED_CARDS.find(([oldId])=>oldId === id)?.[1] || id;
@@ -290,8 +297,8 @@
     return [...byYear].sort(([a],[b])=>a === null ? 1 : b === null ? -1 : order === 'year-asc' ? a-b : b-a);
   }
   function releaseBatches(state, query) {
-    const terms = normalizeSearch(query).replace(/(^|\s)(\d{4})(?:\s*年)?(?=\s|$|[^\d.])/g,'$1$2 ');
-    const matches = searchFilter(terms);
+    const terms = normalizeSearch(query).replace(/(^|\s)(\d{4})(?=[^\d.\s年])/g,'$1$2 ');
+    const matches = searchFilter(terms,undefined,true);
     const batches = new Map();
     for (const card of homeCatalog(state)) {
       const id = card.releaseBatchId;

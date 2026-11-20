@@ -118,7 +118,7 @@
   function catalogMarkup() {
     const count = filterKeys.filter(key => filters[key]).length;
     const filter = button(icon('filter') + '筛选' + (count ? '<span class="filter-count">' + count + '</span>' : ''), 'filters', 'filter-trigger' + (count ? ' selected' : ''), 'aria-label="筛选图鉴"');
-    return '<main class="page" data-screen-label="图鉴"><header class="topbar"><div class="brand"><div class="brand-icon">' + icon('bag') + '</div><h1>乐事薯片袋图鉴</h1></div></header><div class="search-row"><label class="search">' + icon('search') + '<input id="catalog-search" type="search" maxlength="60" placeholder="名称 / 口味 / 系列" aria-label="搜索包装名称、口味或系列" value="' + esc(filters.search) + '"></label>' + filter + '</div><div id="catalog-results">' + catalogResults() + '</div></main>' + navigation();
+    return '<main class="page" data-screen-label="图鉴"><header class="topbar"><div class="brand"><div class="brand-icon">' + icon('bag') + '</div><h1>乐事薯片袋图鉴</h1></div></header><div class="search-row"><label class="search">' + icon('search') + '<input id="catalog-search" type="search" maxlength="60" placeholder="搜口味、包装或年份" aria-label="搜索包装名称、口味、系列或年份" value="' + esc(filters.search) + '"></label>' + filter + '</div><div id="catalog-results">' + catalogResults() + '</div></main>' + navigation();
   }
   function searchBox(id,label,placeholder,value) {
     return '<div class="search-row"><label class="search">' + icon('search') + '<input id="' + id + '" type="search" maxlength="60" aria-label="' + label + '" placeholder="' +
