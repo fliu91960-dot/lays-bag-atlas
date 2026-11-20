@@ -103,9 +103,13 @@
     const clearFilters = selected.length > 1 ? button('清除筛选','clear-filters','clear-filters') : '';
     const actions = button('发行批次 ' + icon('arrow'),'batch-directory','text-btn') + (!PUBLIC ? button(icon('plus') + '补充图鉴','submit','text-btn') : '');
     const heading = '<div class="catalog-heading"><strong>' + (selected.some(key=>key !== 'order') || filters.search ? '筛选结果' : '全部图鉴') + ' <span class="muted">' + items.length + '</span></strong><div class="catalog-tools">' + actions + '</div></div>';
-    const results = items.length ? (filters.order ? yearGroups(items,filters.order,cardGrid) : cardGrid(items,true,5)) :
-      empty('没有找到这款包装','试试其他口味，或清除筛选条件。',button('查看全部图鉴','clear-all','btn secondary'));
-    return (summary ? '<div class="filter-summary">' + summary + clearFilters + '</div>' : '') + heading + results;
+    const unfilteredCount = !items.length && selected.some(key=>key !== 'order')
+      ? C.catalog(state,{search:filters.search}).length : 0;
+    const results = items.length ? (filters.order ? yearGroups(items,filters.order,cardGrid) : cardGrid(items,true,5))
+      : unfilteredCount ? empty('当前筛选没有结果','清除筛选后有 ' + unfilteredCount + ' 款符合搜索。',
+        button('清除筛选','clear-filters','btn secondary'))
+      : empty('没有找到这款包装','试试其他名称或口味。',button('查看全部图鉴','clear-all','btn secondary'));
+    return (summary ? '<div class="filter-summary">' + summary + (unfilteredCount ? '' : clearFilters) + '</div>' : '') + heading + results;
   }
   function catalogMarkup() {
     const count = filterKeys.filter(key => filters[key]).length;
@@ -119,7 +123,8 @@
   function favoriteResults() {
     const items = C.favorites(state,favoriteTab,{query:favoriteSearch,recent:true});
     if (!items.length && favoriteSearch.trim()) return empty('这页收藏没有匹配的包装','',button('清除收藏搜索','clear-favorite-search','btn secondary'));
-    return items.length ? cardGrid(items) : empty(favoriteTab === 'owned' ? '还没有已拥有的包装' : '还没有想要收藏的包装','',
+    return items.length ? cardGrid(items) : empty(favoriteTab === 'owned' ? '还没有已拥有的包装' : '还没有想要收藏的包装',
+      '在包装详情中，点「' + (favoriteTab === 'owned' ? '标记拥有' : '想要收藏') + '」即可添加。',
       button('浏览图鉴','nav','btn','data-name="catalog"'));
   }
   function favoritesMarkup() {
@@ -156,7 +161,10 @@
     const edit = !PUBLIC && C.user(state).role !== 'user' ? button(icon('edit'),'edit','back','aria-label="编辑图鉴" data-id="' + esc(chip.id) + '"')
       : PUBLIC && chip.active !== false && location.protocol !== 'file:' ? button('复制单品链接','share-chip','btn secondary') : '';
     const pending = side === 'coverImage' && chip.imagePending;
-    const picture = pending ? '<div class="image-pending">' + icon('bag') + '<span>正面图片待补</span></div>' : '<img src="' + esc(image(chip[side] || chip.coverImage)) + '" alt="' + esc(chip.name) + (side === 'backImage' ? '背面' : '正面') + '">' + button(icon('zoom'),'zoom','zoom','aria-label="放大包装图片"');
+    const picture = pending ? '<div class="image-pending">' + icon('bag') + '<span>正面图片待补</span></div>'
+      : button('<img src="' + esc(image(chip[side] || chip.coverImage)) + '" alt="' + esc(chip.name) +
+        (side === 'backImage' ? '背面' : '正面') + '"><span class="zoom">' + icon('zoom') + '</span>',
+        'zoom','zoom-target','aria-label="放大包装图片"');
     const switcher = chip.backImage ? '<div class="image-switch">' + [['coverImage','正面'],['backImage','背面']].map(([key,title]) => button(title,'side',side === key ? 'active' : '', 'data-side="' + key + '" aria-pressed="' + (side === key) + '"')).join('') + '</div>' : '';
     const seen = chip.firstSeenYear || chip.flavorDocumentedYear;
     const facts = [['发行市场',chip.market],['包装年份',chip.year ? chip.year + '年' : '待核实'],['包装形态',chip.packagingForm]];
@@ -175,7 +183,7 @@
     const actions = chip.active === false
       ? (status ? button('取消收藏','favorite','btn secondary full','data-status=""') : '<p class="form-hint">这款图鉴已下架。</p>')
       : button(icon('check') + (status === 'owned' ? '已拥有' : '标记拥有'),'favorite','btn ' + (status === 'owned' ? 'on-owned' : 'secondary'),'data-status="owned" aria-pressed="' + (status === 'owned') + '"')
-        + button(icon('heart') + (status === 'wanted' ? '已加入心愿' : '想要收藏'),'favorite','btn ' + (status === 'wanted' ? 'on-wanted' : ''),'data-status="wanted" aria-pressed="' + (status === 'wanted') + '"');
+        + button(icon('heart') + (status === 'wanted' ? '已标记想要' : '想要收藏'),'favorite','btn ' + (status === 'wanted' ? 'on-wanted' : ''),'data-status="wanted" aria-pressed="' + (status === 'wanted') + '"');
     return '<main class="page" data-screen-label="图鉴详情">' + header('图鉴详情',edit) + '<div class="detail-layout"><div><div class="detail-hero">' + picture + '</div>' + switcher + '</div><article class="detail-info"><h1>' + esc(chip.name) + '</h1><div class="tag-row">' + tags(chip) + (chip.active === false ? '<span class="tag">已下架</span>' : '') + '</div>' + batchLink + '<dl class="detail-fields">' + rows + '</dl>' + related + (chip.description ? '<p class="description">' + esc(chip.description) + '</p>' : '') + imageSource + historyMarkupFor(chip) + contribute + '</article></div></main><div class="sticky-actions"><div class="action-row">' + actions + '</div></div>';
   }
   function packageOption(chip, action, selected = false) {
@@ -365,7 +373,7 @@
     if (!sheet) return '';
     if (sheet.type === 'zoom') {
       const chip = state.chips.find(c => c.id === route.id);
-      return '<div class="viewer" role="dialog" aria-modal="true" aria-label="包装大图">' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭大图"') + '<img src="' + esc(image(chip?.[side] || chip?.coverImage)) + '" alt="包装大图"><p>' + esc(chip?.name || '') + '</p></div>';
+      return '<div class="viewer" role="dialog" aria-modal="true" aria-label="包装大图" data-action="overlay-close">' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭大图"') + '<img src="' + esc(image(chip?.[side] || chip?.coverImage)) + '" alt="包装大图"><p>' + esc(chip?.name || '') + '</p></div>';
     }
     const title = {filters:'筛选图鉴',about:'关于图鉴',discard:'放弃这次修改？',active:'下架这款图鉴？',submission:'投稿详情',share:route.name === 'batch' ? '批次链接' : '单品链接'}[sheet.type] || '';
     let content = '';
@@ -378,7 +386,9 @@
         '</div><div class="filter-actions"><output id="filter-preview" aria-live="polite"></output><div class="action-row">' +
         button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></div></form>';
     }
-    if (sheet.type === 'about') content = '<p>图鉴当前收录 ' + C.catalog(state).length + ' 条产品记录，包含不同市场、系列及包装形态。筛选支持年份、系列、袋装／罐装与净含量。详情保留素材来源。</p><p>收藏中预放了一组展示记录，可自行调整。图片和操作保存在当前浏览器。</p>' + button('知道了','close-sheet','btn full');
+    if (sheet.type === 'about') content = '<p>图鉴当前收录 ' + C.catalog(state).length + ' 条产品记录，包含不同市场、系列及包装形态。筛选支持年份、系列、袋装／罐装与净含量。详情保留素材来源。</p><p>' +
+      (PUBLIC ? '在包装详情中可标记拥有或想要，收藏保存在当前浏览器。' : '收藏中预放了一组展示记录，可自行调整。图片和操作保存在当前浏览器。') +
+      '</p>' + button('知道了','close-sheet','btn full');
     if (sheet.type === 'discard') content = '<p>尚未保存的资料和图片会被放弃。</p><div class="action-row">' + button('继续填写','close-sheet','btn secondary') + button('放弃修改','discard','btn danger') + '</div>';
     if (sheet.type === 'active') content = '<p>下架后不再出现在公共图鉴中，已有收藏保留。管理员可以重新上架。</p><div class="action-row">' + button('取消','close-sheet','btn secondary') + button('确认下架','confirm-active','btn danger','data-id="' + esc(sheet.id) + '"') + '</div>';
     if (sheet.type === 'submission') {
@@ -438,6 +448,12 @@
     }
     document.title = (route.name === 'detail' ? state.chips.find(c => c.id === route.id)?.name : root.querySelector('main h1,main h2')?.textContent) || '乐事薯片袋图鉴';
   }
+  function closeSheet() {
+    const wasZoomed = sheet?.type === 'zoom';
+    sheet = null;
+    render(pageScroll());
+    if (wasZoomed) root.querySelector('.zoom-target')?.focus({preventScroll:true});
+  }
   async function write(transform, message, redraw = true) {
     if (busy) return false;
     busy = true; writeEpoch++;
@@ -465,7 +481,7 @@
     const el = event.target.closest('[data-action]'); if (!el || busy) return;
     const a = el.dataset.action, id = el.dataset.id;
     if (a === 'overlay-close' && event.target !== el) return;
-    if (['close-sheet','overlay-close'].includes(a)) { sheet = null; return render(pageScroll()); }
+    if (['close-sheet','overlay-close'].includes(a)) return closeSheet();
     if (a === 'nav') return go(el.dataset.name);
     if (a === 'back') return back();
     if (a === 'discard') return back(true);
@@ -512,7 +528,12 @@
       const originalLabel = el.innerHTML;
       el.disabled = true;
       el.textContent = '正在保存…';
-      try { return await write(s => C.setFavorite(s,chipId,status,previous),'收藏已更新'); }
+      try {
+        if (await write(s => C.setFavorite(s,chipId,status,previous))) {
+          const current = C.favoriteStatus(state,chipId);
+          toast(current === 'owned' ? '已标记拥有' : current === 'wanted' ? '已标记想要' : '已取消收藏');
+        }
+      }
       finally { if (el.isConnected) { el.disabled = false; el.innerHTML = originalLabel; } }
     }
     if (a === 'contribute') { if (PUBLIC) return; return go('submit',{targetChipId:id}); }
@@ -629,7 +650,7 @@
 
   });
   root.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && sheet) { sheet = null; render(pageScroll()); }
+    if (event.key === 'Escape' && sheet) return closeSheet();
     if (event.key === 'Tab' && sheet) {
       const focusable = [...root.querySelectorAll('[role="dialog"] button,[role="dialog"] select,[role="dialog"] input')].filter(e => !e.disabled && !e.closest('[hidden]'));
       const index = focusable.indexOf(document.activeElement);

@@ -19,7 +19,7 @@
       ? C.migrateState(saved || shipped) : saved;
     const user = C.user(value);
     if (value.identityRevision && user?.id === identity && user.showcaseRevision && value.users.every(u=>u.role === 'user')) return value;
-    return C.bindIdentity(value,{id:identity, role:'user'});
+    return C.bindIdentity(value,{id:identity, role:'user'},{seedExamples:false});
   }
   function read() {
     if (preview) return Promise.resolve(preview);

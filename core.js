@@ -147,7 +147,7 @@
     next.fixtureRevision = 4;
     return next;
   }
-  function bindIdentity(input, session) {
+  function bindIdentity(input, session, {seedExamples = true} = {}) {
     assert(session && /^local-[a-f0-9]{24}$/.test(session.id) && ['owner','user'].includes(session.role), '本地身份校验失败，请重新启动应用');
     const next = clone(input);
     if (!next.identityRevision) {
@@ -161,15 +161,15 @@
     let target = next.users.find(u => u.id === session.id);
     if (!target) { target = {id:session.id,name:'收藏者',role:'user'}; next.users.push(target); }
     target.role = session.role; target.name = '收藏者'; next.currentUserId = session.id;
-    if (!target.showcaseRevision) {
+    if (!target.showcaseRevision && seedExamples) {
       const samples = {owned:['fifa-2026-fish','official-cn-1','official-cn-5','official-cn-9','official-cn-12','official-wave-1','official-wave-2'],
         wanted:['fifa-2026-butter','official-cn-13','official-cn-15','official-cn-18','official-wave-3']};
       Object.entries(samples).forEach(([status,ids]) => ids.forEach(chipId => {
         if (next.chips.some(c => c.id === chipId && c.active !== false) && !next.favorites.some(f => f.userId === session.id && f.chipId === chipId))
           next.favorites.push({userId:session.id,chipId,status,updateTime:now()});
       }));
-      target.showcaseRevision = 1;
     }
+    target.showcaseRevision ||= 1;
     return next;
   }
   function user(state) { return state.users.find(item => item.id === state.currentUserId); }
