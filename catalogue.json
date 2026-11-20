@@ -1,5 +1,5 @@
 {
-  "revision": 44,
+  "revision": 45,
   "updatedAt": "2026-11-20",
   "products": [
     {
@@ -1123,7 +1123,7 @@
       "specification": "65g",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/white-l0070-r28.webp",
+      "coverImage": "assets/layout-r45-timeline-l0070.webp",
       "backImage": "",
       "imagePending": false,
       "sourceKind": "media",
@@ -1147,10 +1147,10 @@
       "releaseBatchSourceUrl": "https://pangjing.cn/potato-chips-lays-sakura-new-product-2019/",
       "releaseBatchOrder": 27,
       "releaseBatchPosition": 1,
-      "sourceLabel": "Weee 历史买家实拍，白底整理",
+      "sourceLabel": "Weee 春日限定商品图，保留袋身",
       "sourceUrl": "https://www.sayweee.com/en/product/Lay-s-Potato-Chips-White-Peach-Flavor/94994",
-      "sourceImageUrl": "https://img06.weeecdn.com/social/image/058/855/F9BBB1126320C08.jpeg",
-      "sourceCheckedAt": "2026-11-18",
+      "sourceImageUrl": "https://img08.weeecdn.net/item/image/321/179/4E397BB86B874965.jpeg%21c750x0_q80_t1.auto",
+      "sourceCheckedAt": "2026-11-20",
       "imageSpecification": "65g"
     },
     {
@@ -1166,7 +1166,7 @@
       "specification": "65g",
       "packagingForm": "袋装",
       "description": "",
-      "coverImage": "assets/white-l0071-r28.webp",
+      "coverImage": "assets/layout-r45-timeline-l0071.webp",
       "backImage": "",
       "imagePending": false,
       "sourceKind": "media",
@@ -6692,7 +6692,7 @@
       "specification": "",
       "packagingForm": "袋装",
       "description": "速食面联名",
-      "coverImage": "assets/pack-l0166.jpg",
+      "coverImage": "assets/layout-r45-timeline-l0166.webp",
       "backImage": "",
       "imagePending": false,
       "sourceKind": "media",
@@ -6716,7 +6716,7 @@
       "releaseBatchSourceUrl": "https://www.mobilewiz.com.tw/detail.jsp?id=783",
       "releaseBatchOrder": 25,
       "releaseBatchPosition": 0,
-      "sourceLabel": "www.cosmopolitan.com 包装资料",
+      "sourceLabel": "Cosmopolitan 台湾原图，保留袋身",
       "sourceUrl": "https://www.cosmopolitan.com/tw/lifestyle/hot-topics/g32198771/7-eleven-cookies/",
       "sourceImageUrl": "https://hips.hearstapps.com/hmg-prod/images/3-jpg-1587298488.jpg",
       "sourceCheckedAt": "2026-11-18",

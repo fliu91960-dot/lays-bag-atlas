@@ -88,11 +88,12 @@
       const value = filterLabel(key,filters[key]);
       return button(esc(value) + ' ×', 'remove-filter', '', 'data-key="' + key + '" aria-label="移除筛选 ' + esc(value) + '"');
     }).join('');
+    const clearFilters = selected.length > 1 ? button('清除筛选','clear-filters','clear-filters') : '';
     const actions = button('发行批次 ' + icon('arrow'),'batch-directory','text-btn') + (!PUBLIC ? button(icon('plus') + '补充图鉴','submit','text-btn') : '');
     const heading = '<div class="catalog-heading"><strong>' + (selected.some(key=>key !== 'order') || filters.search ? '筛选结果' : '全部图鉴') + ' <span class="muted">' + items.length + '</span></strong><div class="catalog-tools">' + actions + '</div></div>';
     const results = items.length ? (filters.order ? yearGroups(items,filters.order,cardGrid) : cardGrid(items,true,5)) :
       empty('没有找到这款包装','试试其他口味，或清除筛选条件。',button('查看全部图鉴','clear-all','btn secondary'));
-    return (summary ? '<div class="filter-summary">' + summary + '</div>' : '') + heading + results;
+    return (summary ? '<div class="filter-summary">' + summary + clearFilters + '</div>' : '') + heading + results;
   }
   function catalogMarkup() {
     const count = filterKeys.filter(key => filters[key]).length;
@@ -364,7 +365,7 @@
       const weights = [...new Set(active.flatMap(C.packageWeights))].sort((a,b) => parseFloat(a)-parseFloat(b));
       const years = [...new Set(active.map(c => c.year).filter(Boolean))].sort((a,b) => a-b);
       const batches = [...new Set(active.map(c => c.releaseBatch).filter(Boolean))];
-      content = '<form id="filters-form">' +
+      content = '<form id="filters-form"><div class="filter-fields">' +
         select('market','地区',[...new Set(active.map(c => c.market))],'全部地区') +
         select('year','包装年份',[...years,['unknown','待核实']],'全部年份') +
         select('series','产品系列',series,'全部系列') +
@@ -375,7 +376,7 @@
         select('imageStatus','展示图片',imageOptions,'全部图片') +
         select('order','浏览顺序',orderOptions,'默认顺序') +
         select('releaseBatch','发行批次',batches,'全部批次') +
-        '<div class="filter-actions"><output id="filter-preview" aria-live="polite">' + matchingCount(filters) + '</output><div class="action-row">' +
+        '</div><div class="filter-actions"><output id="filter-preview" aria-live="polite">' + matchingCount(filters) + '</output><div class="action-row">' +
         button('重置','reset-filters','btn secondary') + '<button type="submit" class="btn">查看结果</button></div></div></form>';
     }
     if (sheet.type === 'about') content = '<p>图鉴当前收录 ' + C.catalog(state).length + ' 条产品记录，包含不同市场、系列及包装形态。筛选支持年份、系列、袋装／罐装与净含量。详情保留素材来源。</p><p>收藏中预放了一组展示记录，可自行调整。图片和操作保存在当前浏览器。</p>' + button('知道了','close-sheet','btn full');
@@ -385,7 +386,7 @@
       const s = state.submissions.find(s => s.id === sheet.id);
       content = '<p><strong>' + esc(s.name) + '</strong><br>' + esc(s.market) + ' · ' + (s.year || '年份未知') + ' · ' + statusName[s.status] + '</p><p>' + esc(s.description || '没有补充说明') + '</p>' + (s.reviewRemark ? '<p>审核说明：' + esc(s.reviewRemark) + '</p>' : '') + '<div class="submission-images">' + originalPictures(s) + '</div>' + (s.chipId ? button('查看对应图鉴','detail','btn full','data-id="' + esc(s.chipId) + '"') : button('知道了','close-sheet','btn full'));
     }
-    return '<div class="overlay" data-action="overlay-close"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title">' + title + '</h2>' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭弹窗"') + '</div>' + content + '</section></div>';
+    return '<div class="overlay" data-action="overlay-close"><section class="sheet' + (sheet.type === 'filters' ? ' filter-sheet' : '') + '" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-header"><h2 id="sheet-title">' + title + '</h2>' + button(icon('close'),'close-sheet','sheet-close','aria-label="关闭弹窗"') + '</div>' + content + '</section></div>';
   }
   function matchingCount(query) {
     return '符合条件 ' + C.catalog(state,query).length + ' 款';
@@ -464,6 +465,7 @@
     if (a === 'zoom') { sheet = {type:'zoom'}; return render(pageScroll()); }
     if (a === 'filters') { sheet = {type:'filters'}; return render(pageScroll()); }
     if (a === 'clear-all') { filters = defaultFilters(); return render(); }
+    if (a === 'clear-filters') { filters = {...defaultFilters(),search:filters.search}; return render(); }
     if (a === 'reset-filters') {
       for (const select of el.form.querySelectorAll('select')) select.value = '';
       return refreshFilterPreview(el.form);
